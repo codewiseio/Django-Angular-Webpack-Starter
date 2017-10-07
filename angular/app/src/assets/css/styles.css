@@ -1,4 +1,10 @@
+@import '~https://fonts.googleapis.com/icon?family=Material+Icons';
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+.spacer {
+	flex: 1 1 auto;
+}
+
 body {
-    background: #0147A7;
-    color: #fff;
+	margin: 0px;
 }
