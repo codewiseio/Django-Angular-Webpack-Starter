@@ -1,0 +1,32 @@
+
+
+<mat-card class="login-form-block"> 
+	<form class="login-form" #form="ngForm" (ngSubmit)="register(form)">
+
+		<mat-card-title>
+		  <span>Sign in</span>
+		</mat-card-title>
+
+		<mat-card-content class="row">
+				<mat-form-field class="col-xs-12">
+					<input matInput placeholder="Email address" required 
+						 name="username" [(ngModel)]="model.username">
+				</mat-form-field>
+				<mat-form-field class="col-xs-12">
+					<input matInput placeholder="Password" required
+						name="password" type="password" [(ngModel)]="model.password">
+				</mat-form-field>
+			<div class="clearfix"></div>
+		</mat-card-content>
+		<mat-card-actions class="row">
+			<div class="col-sm-6 text-left">
+				<span><a routerLink="/signup" routerLinkActive="active">Create an account</a></span>
+			</div>
+			<div class="col-sm-6 text-right">
+				<button mat-button type="submit" [disabled]="!form.form.valid">Go</button>
+			</div>
+		</mat-card-actions>
+	</form>
+
+</mat-card>
+

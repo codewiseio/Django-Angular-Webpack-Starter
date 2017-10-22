@@ -69,6 +69,15 @@ Development build
 npm run build
 ```
 
+## Creating a new component
+
+ng g component my-new-component
+
+## Creating a new django application
+
+
+
+
 ## Running the tests
 
 Explain how to run the automated tests for this system
