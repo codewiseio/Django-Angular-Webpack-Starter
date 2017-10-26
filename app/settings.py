@@ -37,19 +37,44 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'angular'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8080'
+)
+CSRF_TRUSTED_ORIGINS = (
+    'localhost:8080'
+)
+CSRF_COOKIE_NAME="XSRF-TOKEN"
+CSRF_HEADER_NAME="HTTP_X_XSRF_TOKEN"
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-xsrf-token',
+    'x-requested-with',
+)
+CORS_EXPOSE_HEADERS = (
+    'Set-Cookie',
+)
 
 ROOT_URLCONF = 'app.urls'
 

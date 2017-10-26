@@ -24,7 +24,7 @@ export class RegisterComponent implements OnInit {
 	 * Register a user
 	 */
 	register() {
-		console.log('Registering');
+		console.log('Registering...');
 		this.RegisterService.register(this.model)
 			.then( user => {
 				console.log('Created user ');

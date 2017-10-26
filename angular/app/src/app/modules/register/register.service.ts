@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
+import { RequestOptions, Response } from '@angular/http';
+import { HttpClient, HttpHeaders }    from '@angular/common/http';
  
 import { User } from '../../models/user';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class RegisterService {
 
-  constructor(private http: Http) { }
+  api: any = environment.api;
+
+  constructor(private http: HttpClient) { }
 
 
   /**
@@ -16,10 +20,15 @@ export class RegisterService {
    */
   register(user: User): Promise<void | User[]> {
 
+    console.log('Calling register.');
+
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    console.log('Angular 4 is kind of a pain....');
+
   	return this.http
-  			 .post('/api/vi/register/', JSON.stringify(user) )
+  			 .post(`${this.api}/register/`, JSON.stringify(user), { headers: headers } )
              .toPromise()
-             .then(response => response.json().data as User[])
+             .then(response => response as User[])
              .catch(this.handleError);
   }
 

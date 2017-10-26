@@ -3,7 +3,7 @@ import { FormsModule }   from '@angular/forms';
 import { BrowserModule }  from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
-import { HttpModule }    from '@angular/http';
+import { HttpClientModule }    from '@angular/common/http';
 
 import { MaterialModule } from './material.module';
 
@@ -11,6 +11,16 @@ import { MaterialModule } from './material.module';
 import { AppComponent } from './app.component';
 import { RegisterComponent } from './modules/register/register.component';
 import { LoginComponent } from './modules/login/login.component';
+
+
+/**
+ * Import the the Interceptor that handles attaching the xsrf token header
+ * when making calls to the Django backend during development. This is done 
+ * because angular's default behaviour does not send the xsrf token when
+ * making requests to another server. 
+ */
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { DevHttpXsrfInterceptor } from './xsrf.interceptor';
 
 
 
@@ -25,7 +35,7 @@ const appRoutes: Routes = [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
-    HttpModule,
+    HttpClientModule,
     MaterialModule,
     RouterModule.forRoot(
       appRoutes,
@@ -37,6 +47,13 @@ const appRoutes: Routes = [
     RegisterComponent,
     LoginComponent
   ],
-  bootstrap: [ AppComponent ]
+  bootstrap: [ AppComponent ],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: DevHttpXsrfInterceptor,
+      multi: true
+    }
+  ]
 })
 export class AppModule { }
