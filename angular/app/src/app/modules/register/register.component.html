@@ -1,8 +1,7 @@
 
 
 <mat-card class="register-form-block"> 
-	<form class="register-form" 
-		[formGroup]="form" (ngSubmit)="register(form)" >
+	<form class="register-form" #form="ngForm" (ngSubmit)="register(form)" >
 
 		<mat-card-title>
 		  <span>Sign Up</span>
@@ -10,22 +9,32 @@
 
 		<mat-card-content class="row">
 				<mat-form-field class="col-xs-12 spacious">
-					<input matInput placeholder="Email address" name="email" formControlName="email">
-					<mat-error *ngIf="form.controls.email.hasError('pattern')">
+					<input matInput placeholder="Email address" 
+						name="email" 
+						[(ngModel)]="model.email" [formControl]="formControls.email" 
+						required uniqueEmail>
+
+					<mat-error *ngIf="formControls.email.hasError('pattern')">
 				      Please enter a valid email address
 				    </mat-error>
-				    <mat-error *ngIf="form.controls.email.hasError('required')">
-				      Email is <strong>required</strong>
+				    <mat-error *ngIf="formControls.email.hasError('required')">
+				      Please enter a valid email address
 				    </mat-error>
+				    <mat-error *ngIf="formControls.email.hasError('unique')">
+				     This email address is already registered
+				    </mat-error>
+				    
 				</mat-form-field>
 
 				<mat-form-field class="col-xs-12 spacious">
-					<input matInput placeholder="Password" required
-						name="password" type="password">
+					<input matInput placeholder="Password"
+						name="password" type="password"
+						required>
 				</mat-form-field>
 				<mat-form-field class="col-xs-12 spacious">
-					<input matInput placeholder="Confirm password" required
-						name="confirm_password" type="password">
+					<input matInput placeholder="Confirm password"
+						name="confirm_password" type="password"
+						required>
 				</mat-form-field>
 			<div class="clearfix"></div>
 		</mat-card-content>

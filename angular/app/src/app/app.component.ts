@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthenticationService } from './services/authentication.service';
+import { UserService } from './services/user.service';
 
 import '../assets/css/styles.css';
 
@@ -7,7 +8,7 @@ import '../assets/css/styles.css';
   selector: 'oikus-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [AuthenticationService]
+  providers: [AuthenticationService, UserService]
 })
 export class AppComponent { 
 

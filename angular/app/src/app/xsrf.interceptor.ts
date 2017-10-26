@@ -16,11 +16,11 @@ export class DevHttpXsrfInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const lcUrl = req.url.toLowerCase();
-    console.log('intercepting');
-    console.log(lcUrl);
+    // console.log('intercepting');
+    // console.log(lcUrl);
 
 
-    console.log(req.headers);
+    // console.log(req.headers);
 
     // if request is "GET" or "HEAD" retrieve the X-SRF token from the cookie
     // supplied by the server

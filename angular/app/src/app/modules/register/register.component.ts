@@ -16,15 +16,17 @@ export class RegisterComponent implements OnInit {
     model: any = {};
     loading = false;
 
-    private form: FormGroup;
+    private formControls: any;
 
     constructor(
         private RegisterService: RegisterService) { }
 
 	ngOnInit() {
-		this.form = new FormGroup({
-			email: new FormControl('', [ Validators.required, Validators.pattern(EMAIL_REGEX)]) 
-		});
+		this.formControls = {
+			email: new FormControl('', [ Validators.pattern(EMAIL_REGEX)]),
+			password: new FormControl(),
+			confirm_password: new FormControl()
+		};
 	}
 
 	/**

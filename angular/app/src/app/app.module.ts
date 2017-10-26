@@ -7,6 +7,8 @@ import { HttpClientModule }    from '@angular/common/http';
 
 import { MaterialModule } from './material.module';
 
+import { UniqueEmailValidatorDirective } from './validators/unique-email-validator.directive';
+
 
 import { AppComponent } from './app.component';
 import { RegisterComponent } from './modules/register/register.component';
@@ -46,7 +48,8 @@ const appRoutes: Routes = [
   declarations: [
     AppComponent,
     RegisterComponent,
-    LoginComponent
+    LoginComponent,
+    UniqueEmailValidatorDirective
   ],
   bootstrap: [ AppComponent ],
   providers: [

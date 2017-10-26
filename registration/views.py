@@ -45,19 +45,23 @@ class CheckEmailView(views.APIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def post(self,request):
-        print (request.data)
+    def get(self,request):
+        print('Check email view.')
+        print (request.GET)
+
+        email = request.GET.get('email')
+        userid = request.GET.get('userid')
 
         # check for existing account with given email
         try:
-            duplicate = User.objects.get(email=request.data)
+            duplicate = User.objects.get(email=email)
             if duplicate:
                 return Response({
-                    'status': 'Conflict',
+                    'status': 'conflict',
                     'valid': False,
                     'message': 'This email is already in use.',
                     'message-token': 'conflict-email'
-                }, status=status.HTTP_409_CONFLICT)
+                }, status=status.HTTP_200_OK)
         except:
                 return Response({
                     'status': 'Valid',
