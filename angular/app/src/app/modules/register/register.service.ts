@@ -16,14 +16,13 @@ export class RegisterService {
   /**
    * Register a new user
    * @param  {User}    user The user data for registration
-   * @return {Promise}      [description]
+   * @return {Promise}      
    */
   register(user: User): Promise<void | User[]> {
 
     console.log('Calling register.');
 
     let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    console.log('Angular 4 is kind of a pain....');
 
   	return this.http
   			 .post(`${this.api}/register/`, JSON.stringify(user), { headers: headers } )
@@ -31,6 +30,22 @@ export class RegisterService {
              .then(response => response as User[])
              .catch(this.handleError);
   }
+
+  /**
+   * Checks to see if an email is already registered
+   * @param  {string}  email Email address to verify
+   * @return {Promise}      
+   */
+  // checkEmailIsRegistered(email: string): Promise<void| boolean> {
+  //   let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    
+  //   return this.http
+  //        .post(`${this.api}/check-email/`, email, { headers: headers } )
+  //            .toPromise()
+  //            .then(response => response as User[])
+  //            .catch(this.handleError);    
+  // }
+
 
 
   handleError() {

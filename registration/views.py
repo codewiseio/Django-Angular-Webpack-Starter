@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
 User = get_user_model()
+from authentication.models import UserManager
 from authentication.serializers import UserSerializer
 
 class RegisterView(generics.CreateAPIView):
@@ -16,7 +17,7 @@ class RegisterView(generics.CreateAPIView):
         
         # check for existing account with given email
         try:
-            duplicate = User.objects.get(email=request.data.get('username'))
+            duplicate = User.objects.get(email=request.data.get('email'))
             if duplicate:
                 return Response({
                     'status': 'Conflict',
@@ -30,9 +31,7 @@ class RegisterView(generics.CreateAPIView):
         
         # validate supplied data
         if serializer.is_valid():
-            
-            # create account
-            User.objects.create_user(**serializer.validated_data)
+            instance =  serializer.save()
             return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
         
         # data not valid, return bad request response
@@ -41,13 +40,26 @@ class RegisterView(generics.CreateAPIView):
             'message': 'Account could not be created with received data.'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-class CheckUsernameView(views.APIView):
+class CheckEmailView(views.APIView):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def get(self,request):
-        console.log('Get request.')
-
     def post(self,request):
-        console.log('Post request.')
+        print (request.data)
+
+        # check for existing account with given email
+        try:
+            duplicate = User.objects.get(email=request.data)
+            if duplicate:
+                return Response({
+                    'status': 'Conflict',
+                    'valid': False,
+                    'message': 'This email is already in use.',
+                    'message-token': 'conflict-email'
+                }, status=status.HTTP_409_CONFLICT)
+        except:
+                return Response({
+                    'status': 'Valid',
+                    'valid': True
+                }, status=status.HTTP_200_OK)
