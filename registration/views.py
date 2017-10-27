@@ -40,8 +40,10 @@ class RegisterView(generics.CreateAPIView):
             'message': 'Account could not be created with received data.'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-class CheckEmailView(views.APIView):
 
+
+class CheckEmailView(views.APIView):
+    """ Determine if an email is already registered with a user account."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -53,17 +55,22 @@ class CheckEmailView(views.APIView):
         userid = request.GET.get('userid')
 
         # check for existing account with given email
-        try:
-            duplicate = User.objects.get(email=email)
-            if duplicate:
-                return Response({
-                    'status': 'conflict',
-                    'valid': False,
-                    'message': 'This email is already in use.',
-                    'message-token': 'conflict-email'
-                }, status=status.HTTP_200_OK)
-        except:
-                return Response({
-                    'status': 'Valid',
-                    'valid': True
-                }, status=status.HTTP_200_OK)
+        duplicates = User.objects.filter(email=email)
+
+        # exclude the account already registered with this email
+        if userid:
+            duplicates = duplicates.exclude(id=userid)
+
+        results = duplicates.all()
+        if len(results) > 0:
+            return Response({
+                'status': 'conflict',
+                'valid': False,
+                'message': 'This email is already in use.',
+                'message-token': 'conflict-email'
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'status': 'Valid',
+                'valid': True
+            }, status=status.HTTP_200_OK)

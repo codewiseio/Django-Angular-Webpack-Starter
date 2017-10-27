@@ -21,24 +21,45 @@ class UserSerializer(serializers.ModelSerializer):
         password = validated_data.get('password', None)
         confirm_password = validated_data.get('confirm_password', None)
 
-        if password and confirm_password and password == confirm_password:
-            instance = User(email=validated_data['email'])
-            instance.set_password(password)
-            instance.save()
+        # create the instance
+        instance = User(email=validated_data['email'])
+
+        # set the password
+        instance = self.set_password(instance, password, confirm_password)
+
+        # save
+        instance.save()            
 
         return instance
 
     def update(self, instance, validated_data):
         instance.email = validated_data.get('email', instance.email)
-        instance.save()
 
-        password = validated_data.get('password', None)
-        confirm_password = validated_data.get('confirm_password', None)
+        # set the password
+        instance = self.set_password(instance, password, confirm_password)
 
-        if password and confirm_password and password == confirm_password:
-            instance.set_password(password)
-            instance.save()
+        # save
+        instance.save()  
 
         update_session_auth_hash(self.context.get('request'), instance)
 
         return instance
+
+    def set_password(self, instance, password, confirm_password):
+        # if confirm password supplied
+        if confirm_password:
+
+            # test that password and confirmation match
+            if password and confirm_password and password == confirm_password:
+                instance.set_password(password)
+
+            # password/confirmation do not match
+            else:
+                raise ValueError('Passwords do not match.')
+
+        # if no password confirmation, just save the password
+        elif password:
+            instance.set_password(password)
+
+        return instance
+        

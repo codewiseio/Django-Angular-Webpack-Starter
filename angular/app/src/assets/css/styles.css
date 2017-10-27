@@ -11,3 +11,15 @@
 body {
 	margin: 0px;
 }
+
+.mat-form-field.spacious {
+	margin-bottom: 1em;
+}
+
+mat-icon.toggle-display-password {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	cursor: pointer;
+	color: grey;
+}

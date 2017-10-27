@@ -55,6 +55,15 @@ python manage.py runserver
 You now have your Angular/Django application running. 
 
 
+Building the Angular App
+
+```
+cd angular/app
+webpack --watch
+```
+
+
+
 Start lite server
 
 ```

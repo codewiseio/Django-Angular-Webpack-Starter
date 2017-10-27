@@ -4,7 +4,12 @@ import { UserService } from '../services/user.service';
 
 @Directive({
   selector: '[uniqueEmail]',
-  providers: [{provide:NG_ASYNC_VALIDATORS, useExisting: UniqueEmailValidatorDirective, multi: true}]
+  providers: [
+    UserService,
+    {provide:NG_ASYNC_VALIDATORS, 
+     useExisting: UniqueEmailValidatorDirective, 
+     multi: true}
+    ]
 })
 export class UniqueEmailValidatorDirective implements Validator {
 
