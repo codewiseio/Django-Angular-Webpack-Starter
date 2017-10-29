@@ -12,6 +12,23 @@ body {
 	margin: 0px;
 }
 
+
+.sm-centered-card {
+	margin: 18px auto;
+	width: 500px;
+	max-width: 100%;
+}
+
+@media screen and (max-width: 600px) {
+	.sm-centered-card  {
+		margin-left: 18px;
+		margin-right: 18px;
+		width: auto;
+		max-width: auto;
+		flex: 1;
+	}
+}
+
 .mat-form-field.spacious {
 	margin-bottom: 1em;
 }
@@ -22,4 +39,10 @@ mat-icon.toggle-display-password {
 	top: 0px;
 	cursor: pointer;
 	color: grey;
+}
+
+ul.plain-list {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
 }

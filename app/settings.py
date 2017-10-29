@@ -27,6 +27,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'codewiseio@gmail.com'
+EMAIL_HOST_PASSWORD = 'Develop@live2016'
+EMAIL_USE_TLS = True
+
+REGISTRATION_REQUIRE_ACTIVATION = True
+REGISTRATION_OPEN_REGISTRATION = True
+REGISTRATION_USERNAMES = False
+
 
 # Application definition
 
@@ -36,9 +46,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sites',
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'app',
     'corsheaders',
     'angular',
     'authentication',
@@ -57,12 +69,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-CORS_ORIGIN_WHITELIST = (
-    'localhost:8080'
-)
-CSRF_TRUSTED_ORIGINS = (
-    'localhost:8080'
-)
+
 CSRF_COOKIE_NAME="XSRF-TOKEN"
 CSRF_HEADER_NAME="HTTP_X_XSRF_TOKEN"
 CORS_ALLOW_HEADERS = (
@@ -79,6 +86,17 @@ CORS_ALLOW_HEADERS = (
 CORS_EXPOSE_HEADERS = (
     'Set-Cookie',
 )
+
+""" To be used if running seperate development server for the angular
+    application. Currently angular does not support automatic handling
+    of multiple CSRF Tokens.
+"""
+# CORS_ORIGIN_WHITELIST = (
+#     'localhost:8080'
+# )
+# CSRF_TRUSTED_ORIGINS = (
+#     'localhost:8080'
+# )
 
 ROOT_URLCONF = 'app.urls'
 
@@ -103,7 +121,6 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -155,3 +172,11 @@ STATIC_URL = '/static/'
 # STATICFILES_DIRS = (
 #   os.path.join(BASE_DIR, 'static/'),
 # )
+# 
+# 
+SITE_ID = 1
+
+
+import os.path
+if os.path.exists('app/settings_local.py'):
+    from .settings_local import *

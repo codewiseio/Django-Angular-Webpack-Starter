@@ -1,6 +1,15 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
+# for random string generation
+import string
+import random
+
+# for dispatching emails after creating new activation and password reset links
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.mail import send_mail
+
 
 class UserManager(BaseUserManager):
     """
@@ -75,3 +84,73 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __unicode__(self):
         return self.email
 
+
+
+
+
+
+class UserActivation(models.Model):
+    """ Provide activation links for new users.
+    
+    Generates a random key which is used to activate a new user account. Emails can
+    then be sent to users with a link containing the key. Once this link has been
+    followed the account will be set to active.
+    
+    Extends:
+        models.Model
+    
+    Variables:
+        user (models.ForeignKey): User account to activate
+        key  (models.StringField): Randomly generated string of eight uppercase letters and numbers
+        created (models.DateTimeField): Time activation link was created
+        activated (models.DateTimeField): Time account was activated
+    """
+
+    def generate_key():
+        """Generate a random string of 8 uppercase letters and numbers
+
+        Returns:
+            string: Random string of 8 uppercase letters and numbers
+
+        """
+        return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
+
+    user      = models.ForeignKey('User', on_delete=models.CASCADE, blank=False, null=False)    
+    key       = models.CharField(max_length=8,unique=True,blank=False,null=False,default=generate_key)
+    created   = models.DateTimeField(auto_now_add=True,blank=True,null=False)
+    activated = models.DateTimeField(blank=True,null=True)
+
+
+
+
+
+class UserPasswordReset(models.Model):
+    """ Provide password reset links for new users.
+    
+    Generates a random key which is used to reset user account passwords. Emails can
+    then be sent to users with a link containing the key. Once this link has been
+    followed the user can set a new password.
+    
+    Extends:
+        models.Model
+    
+    Variables:
+        user (models.ForeignKey): User account to activate
+        key  (models.StringField): Randomly generated string of 16 uppercase letters and numbers
+        created (models.DateTimeField): Time reset link was created
+        activated (models.DateTimeField): Time reset link was followed
+    """
+
+    def generate_key():
+        """Generate a random string of 16 uppercase letters and numbers
+
+        Returns:
+            string: Random string of 16 uppercase letters and numbers
+
+        """
+        return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
+
+    user      = models.ForeignKey('User', on_delete=models.CASCADE, blank=False, null=False) 
+    key       = models.CharField(max_length=16,unique=True,blank=False,null=False,default=generate_key)
+    created   = models.DateTimeField(auto_now_add=True,blank=True,null=False)
+    activated = models.DateTimeField(blank=True,null=True)

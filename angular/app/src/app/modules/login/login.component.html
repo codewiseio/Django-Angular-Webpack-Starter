@@ -1,29 +1,42 @@
 
 
-<mat-card class="login-form-block"> 
-	<form class="login-form" #form="ngForm" (ngSubmit)="register(form)">
+<mat-card class="sm-centered-card"> 
+	<form class="login-form" (ngSubmit)="login(form)" [formGroup]="form">
 
 		<mat-card-title>
 		  <span>Sign in</span>
 		</mat-card-title>
 
 		<mat-card-content class="row">
-				<mat-form-field class="col-xs-12">
-					<input matInput placeholder="Email address" required 
-						 name="username" [(ngModel)]="model.username">
+				<mat-form-field class="col-xs-12 spacious">
+					<input matInput placeholder="Email address" 
+						name="email" formControlName="email"
+						[(ngModel)]="model.email" 
+						required >
 				</mat-form-field>
-				<mat-form-field class="col-xs-12">
-					<input matInput placeholder="Password" required
-						name="password" type="password" [(ngModel)]="model.password">
+
+				<mat-form-field class="col-xs-12 spacious">
+					<input matInput placeholder="Password"
+						name="password" type="password" formControlName="password"
+						[type]="showPassword ? 'text' : 'password'"
+						[(ngModel)]="model.password" 
+						required>
+					<mat-icon class="toggle-display-password" (click)="showPassword=!showPassword">
+						{{showPassword ? 'visibility_off' : 'visibility'}}
+					</mat-icon>						
 				</mat-form-field>
+
 			<div class="clearfix"></div>
 		</mat-card-content>
 		<mat-card-actions class="row">
 			<div class="col-sm-6 text-left">
-				<span><a routerLink="/signup" routerLinkActive="active">Create an account</a></span>
+				<ul class="plain-list">
+					<li><a routerLink="/register" routerLinkActive="active">Create an account</a></li>
+					<li><a routerLink="/reset-password" routerLinkActive="active">I forgot my password</a></li>
+				</ul>
 			</div>
 			<div class="col-sm-6 text-right">
-				<button mat-button type="submit" [disabled]="!form.form.valid">Go</button>
+				<button mat-button type="submit" [disabled]="!form.valid">Go</button>
 			</div>
 		</mat-card-actions>
 	</form>

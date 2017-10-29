@@ -14,6 +14,7 @@ import { ConfirmPasswordValidatorDirective } from './validators/confirm-password
 import { AppComponent } from './app.component';
 import { RegisterComponent } from './modules/register/register.component';
 import { LoginComponent } from './modules/login/login.component';
+import { ResetPasswordComponent } from './modules/reset-password/reset-password.component';
 
 
 /**
@@ -30,6 +31,7 @@ import { DevHttpXsrfInterceptor } from './xsrf.interceptor';
 const appRoutes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'reset-password', component: ResetPasswordComponent }
 ];
 
 
@@ -49,6 +51,7 @@ const appRoutes: Routes = [
   declarations: [
     AppComponent,
     RegisterComponent,
+    ResetPasswordComponent,
     LoginComponent,
     ConfirmPasswordValidatorDirective,
     UniqueEmailValidatorDirective,

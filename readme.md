@@ -21,8 +21,11 @@ pip
 Clone the repository from git
 
 ```
-Give the example
+git clone git@gitlab.com:codewiseio/Django-Angular-Webpack-Starter.git
 ```
+
+
+#### Install Back End
 
 Create and enter python virtual environment.
 
@@ -37,6 +40,21 @@ Install the python requirements
 pip install -r requirements.txt
 ```
 
+Install database migrations
+
+```
+python manage.py migrate
+```
+
+Create the super user. 
+
+```
+python manage.py createsuperuser
+```
+
+
+#### Install Front End
+
 Install the angular/material dependancies
 
 ```
@@ -44,39 +62,48 @@ cd angular/app
 npm install
 ```
 
-Start the Django development server and open in your browser 
-at http://localhost:8000
+
+### Development 
+
+
 
 ```
 cd ../..
 python manage.py runserver
 ```
 
-You now have your Angular/Django application running. 
+Start the Django development server and open in your browser at 
+http://localhost:8000. 
 
-
-Building the Angular App
+#### Webpack
 
 ```
 cd angular/app
 webpack --watch
 ```
 
+This will watch the for changes in files in the angular app folder and rebuild
+as necessary. 
 
 
-Start lite server
+
+#### Lite Server
 
 ```
 cd angular/app
 npm start
 ```
 
+This will start the angular server which automatically refreshes the browser on changes.
 
-Development build
+*NOT CURRENTLY SUPPORTED*
 
-```
-npm run build
-```
+Angular does not currently support multiple CSRF tokens. For this reason it is not recommended
+to run a seperate development server for the Django and Angular applications. This may change
+in the future.
+
+
+
 
 ## Creating a new component
 
@@ -103,6 +130,33 @@ Give an example
 ## Deployment
 
 Add additional notes about how to deploy this on a live system
+
+
+## Additional Information
+
+### Adding Models to the Admin Section
+
+```
+from django.contrib import admin
+from django.db import models
+
+@admin.register(MyModel)
+class MyModel(models.Model):
+    ...
+```
+
+### Creating Data Migrations in Django
+
+python manage.py makemigrations app --empty
+
+
+
+### Resources
+
+Sites, finding absolute url
+https://docs.djangoproject.com/en/1.11/ref/contrib/sites/
+
+
 
 ## Built With
 
