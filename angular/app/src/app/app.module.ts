@@ -7,14 +7,11 @@ import { HttpClientModule }    from '@angular/common/http';
 
 import { MaterialModule } from './material.module';
 
-import { UniqueEmailValidatorDirective } from './validators/unique-email-validator.directive';
-import { ConfirmPasswordValidatorDirective } from './validators/confirm-password-validator.directive';
+
+import { AuthenticationModule } from './modules/authentication/authentication.module';
 
 
 import { AppComponent } from './app.component';
-import { RegisterComponent } from './modules/register/register.component';
-import { LoginComponent } from './modules/login/login.component';
-import { ResetPasswordComponent } from './modules/reset-password/reset-password.component';
 
 
 /**
@@ -29,9 +26,10 @@ import { DevHttpXsrfInterceptor } from './xsrf.interceptor';
 
 
 const appRoutes: Routes = [
-  { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'reset-password', component: ResetPasswordComponent }
+  // { path: 'register', component: RegisterComponent },
+  // { path: 'login', component: LoginComponent },
+  // { path: 'reset-password', component: ResetPasswordComponent },
+  // { path: 'activate/:key', component: UserActivationComponent }
 ];
 
 
@@ -43,18 +41,15 @@ const appRoutes: Routes = [
     ReactiveFormsModule,
     HttpClientModule,
     MaterialModule,
+
+    AuthenticationModule,
     RouterModule.forRoot(
       appRoutes,
       { enableTracing: true } // <-- debugging purposes only
     )
   ],
   declarations: [
-    AppComponent,
-    RegisterComponent,
-    ResetPasswordComponent,
-    LoginComponent,
-    ConfirmPasswordValidatorDirective,
-    UniqueEmailValidatorDirective,
+    AppComponent
   ],
   bootstrap: [ AppComponent ],
   providers: [

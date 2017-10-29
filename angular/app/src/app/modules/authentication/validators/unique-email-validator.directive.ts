@@ -1,6 +1,6 @@
 import { Directive } from '@angular/core';
 import { NG_ASYNC_VALIDATORS, Validator, FormControl, ValidationErrors } from '@angular/forms';
-import { UserService } from '../services/user.service';
+import { UserService } from '../../../services/user.service';
 
 @Directive({
   selector: '[uniqueEmail]',
