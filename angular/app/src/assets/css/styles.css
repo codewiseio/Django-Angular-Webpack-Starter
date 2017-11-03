@@ -2,6 +2,13 @@
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 @import "~bootstrap/dist/css/bootstrap.css";
 
+mat-toolbar .site-title a,
+mat-toolbar .site-title a:hover,
+mat-toolbar .site-title a:visited
+ {
+	color: white;
+	text-decoration: none;
+}
 
 
 .spacer {
@@ -45,4 +52,10 @@ ul.plain-list {
     list-style-type: none;
     padding: 0px;
     margin: 0px;
+}
+
+mat-progress-bar.valign-bottom {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
 }

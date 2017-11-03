@@ -7,14 +7,13 @@ from django.db import migrations
 
 def set_development_site(apps, schema_editor):
 	Site = apps.get_model('sites', 'Site')
-	current= Site.objects.get_current()
-	current.domain = "localhost:8000"
-	current.name = "Django-Angular-Webpack-Starter"
+	current= Site.objects.create(domain='localhost:8000',name="Django-Angular-Webpack-Starter")
 	current.save()
 
 class Migration(migrations.Migration):
 
     dependencies = [
+    	('sites', '0002_alter_domain_unique')
     ]
 
     operations = [

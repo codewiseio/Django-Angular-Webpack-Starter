@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,12 +27,6 @@ SECRET_KEY = '(4ovjq!g($$rulimw$zr(j08da(yq7g=9-0ntx7ur0+%==7nzq'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'codewiseio@gmail.com'
-EMAIL_HOST_PASSWORD = 'Develop@live2016'
-EMAIL_USE_TLS = True
 
 REGISTRATION_REQUIRE_ACTIVATION = True
 REGISTRATION_OPEN_REGISTRATION = True
@@ -50,14 +45,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_jwt',
     'app',
     'corsheaders',
     'angular',
-    'authentication',
-    'registration'
+    'authentication'
 ]
 
-AUTH_USER_MODEL = 'authentication.User'
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -70,22 +66,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CSRF_COOKIE_NAME="XSRF-TOKEN"
-CSRF_HEADER_NAME="HTTP_X_XSRF_TOKEN"
-CORS_ALLOW_HEADERS = (
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-xsrf-token',
-    'x-requested-with',
-)
-CORS_EXPOSE_HEADERS = (
-    'Set-Cookie',
-)
 
 """ To be used if running seperate development server for the angular
     application. Currently angular does not support automatic handling
@@ -175,6 +155,42 @@ STATIC_URL = '/static/'
 # 
 # 
 SITE_ID = 1
+
+
+AUTH_USER_MODEL = 'authentication.User'
+
+
+REST_FRAMEWORK = {
+  #  Uncomment to force all pages to require authentication
+  # 'DEFAULT_AUTHENTICATION_CLASSES': (
+  #   'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+  # ),
+}
+
+JWT_AUTH = {
+    'JWT_SECRET_KEY': SECRET_KEY,
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    # 'JWT_ALLOW_REFRESH': False,
+    # 'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7)
+}
+
+CSRF_COOKIE_NAME="XSRF-TOKEN"
+CSRF_HEADER_NAME="HTTP_X_XSRF_TOKEN"
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-xsrf-token',
+    'x-requested-with',
+)
+CORS_EXPOSE_HEADERS = (
+    'Set-Cookie',
+)
 
 
 import os.path

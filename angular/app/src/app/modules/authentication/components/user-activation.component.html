@@ -1,0 +1,49 @@
+
+
+<mat-card class="sm-centered-card" [@slideIn] [@shrinkOut]  *ngIf="pageState == 'success'"> 
+	<mat-card-title>
+	  <span>Ready</span>
+	</mat-card-title>
+
+	<mat-card-content class="row">
+			<div class="col-xs-12 spacious">
+				Your account is now active. 
+			</div>
+	</mat-card-content>
+	<mat-card-actions class="row">
+		<div class="col-xs-12 text-right">
+			<button mat-button routerLink="/login" routerLinkActive="active"><a routerLink="/login" routerLinkActive="active">Login</a></button>
+		</div>
+	</mat-card-actions>
+</mat-card>
+
+
+<mat-card class="sm-centered-card" [@slideIn] [@shrinkOut]  *ngIf="pageState == 'fail'"> 
+	<mat-card-title>
+	  <span>Hmmm...</span>
+	</mat-card-title>
+
+	<mat-card-content class="row">
+			<div class="col-xs-12 spacious">
+				We could not activate your account.
+			</div>
+	</mat-card-content>
+</mat-card>
+
+
+<mat-card class="sm-centered-card " [@slideIn] [@shrinkOut]  *ngIf="pageState == 'duplicate'"> 
+	<mat-card-title>
+	  <span>Hmmm...</span>
+	</mat-card-title>
+
+	<mat-card-content class="row">
+			<div class="col-xs-12 spacious">
+				Your account is already active. 
+			</div>
+	</mat-card-content>
+	<mat-card-actions class="row">
+		<div class="col-xs-12 text-right">
+			<button mat-button routerLink="/login" routerLinkActive="active"><a routerLink="/login" routerLinkActive="active">Login</a></button>
+		</div>
+	</mat-card-actions>
+</mat-card>

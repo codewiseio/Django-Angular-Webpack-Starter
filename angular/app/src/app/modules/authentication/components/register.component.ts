@@ -1,47 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/core';
-import { UserService } from '../../services/user.service';
+import { AuthenticationService } from '../services/authentication.service';
 import { FormGroup, FormControl, Validators} from '@angular/forms';
 
+import { slideIn, slideOut, shrinkOut } from '../animations';
 
 
 const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
 @Component({
   templateUrl: './register.component.html',
-  providers: [UserService],
-  animations: [
-    trigger(
-      'cardState',
-      [
-		transition(
-			':enter', [
-			  style({transform: 'translateX(-100%)', opacity: 0}),
-			  animate('200ms', style({transform: 'translateX(0)', 'opacity': 1}))
-			]
-		),
-		transition(
-			':leave', [
-				style({transform: 'translateX(0) scale(1)'}),
-				animate('200ms', style({transform: 'translateX(0) scale(0)'}))
-			]
-		),		
-      ]
-    ) 
-  ]
+  animations: [slideIn, shrinkOut]
 })
 export class RegisterComponent implements OnInit {
 
-    model: any = {};
-    loading = false;
-
+    private model: any = {};
     private form: any;
     private showPassword: boolean;
-
+    private loading: boolean = false;
     private formState: string = 'pending';
 
     constructor(
-        private UserService: UserService) { }
+        private service: AuthenticationService) { }
 
 	ngOnInit() {
 		this.form = new FormGroup({
@@ -54,13 +34,10 @@ export class RegisterComponent implements OnInit {
 	 * Register a user
 	 */
 	submit() {
-		console.log('Registering...');
-
-		this.UserService.register(this.model)
+		this.loading = true;
+		this.service.register(this.model)
 			.then( user => {
-				this.formState = 'transitioning';
-				setTimeout( () => {this.formState = 'complete'}, 205);
-
+				this.formState = 'complete';
 				console.log('Created user ');
 				console.log(user);
 			});

@@ -124,7 +124,7 @@ class UserActivation(models.Model):
 
 
 
-class UserPasswordReset(models.Model):
+class ResetPasswordRequest(models.Model):
     """ Provide password reset links for new users.
     
     Generates a random key which is used to reset user account passwords. Emails can
@@ -150,7 +150,19 @@ class UserPasswordReset(models.Model):
         """
         return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
 
+
+    DISABLED = -1
+    ACTIVE = 1
+    USED = 2
+    STATUS_CHOICES = (
+        ("", '-- select --'),
+        (DISABLED, 'Disabled'),
+        (ACTIVE, 'Active'),
+        (USED, 'Used'),
+    )
+
     user      = models.ForeignKey('User', on_delete=models.CASCADE, blank=False, null=False) 
     key       = models.CharField(max_length=16,unique=True,blank=False,null=False,default=generate_key)
     created   = models.DateTimeField(auto_now_add=True,blank=True,null=False)
-    activated = models.DateTimeField(blank=True,null=True)
+    status    = models.SmallIntegerField(choices=STATUS_CHOICES,blank=False,null=False,default=1)
+    used      = models.DateTimeField(blank=True,null=True)

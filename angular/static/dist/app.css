@@ -6755,6 +6755,15 @@ button.close {
   }
 }
 /*# sourceMappingURL=bootstrap.css.map */
+mat-toolbar .site-title a,
+mat-toolbar .site-title a:hover,
+mat-toolbar .site-title a:visited
+ {
+	color: white;
+	text-decoration: none;
+}
+
+
 .spacer {
 	flex: 1 1 auto;
 }
@@ -6796,5 +6805,11 @@ ul.plain-list {
     list-style-type: none;
     padding: 0px;
     margin: 0px;
+}
+
+mat-progress-bar.valign-bottom {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
 }
 /*# sourceMappingURL=app.css.map*/

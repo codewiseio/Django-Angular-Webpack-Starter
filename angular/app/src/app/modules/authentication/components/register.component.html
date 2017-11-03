@@ -1,9 +1,8 @@
 
-
-<mat-card class="sm-centered-card" [@cardState] *ngIf="formState == 'pending'"> 
+<mat-card class="sm-centered-card" [@slideIn] [@shrinkOut] *ngIf="formState == 'pending'"> 
 
 	<form class="register-form" (ngSubmit)="submit(form)" [formGroup]="form">
-
+		
 		<mat-card-title>
 		  <span>Sign Up</span>
 		</mat-card-title>
@@ -41,22 +40,28 @@
 				    </mat-error>						
 				</mat-form-field>
 			<div class="clearfix"></div>
+
+
 		</mat-card-content>
 		<mat-card-actions class="row">
 			<div class="col-sm-6 text-left">
 				<span><a routerLink="/login" routerLinkActive="active">I'm already a member</a></span>
 			</div>
 			<div class="col-sm-6 text-right">
-				<button mat-button type="submit" [disabled]="!form.valid">Get started</button>
+				<button mat-button type="submit" [disabled]="loading || !form.valid">Get started</button>
 			</div>
 
 		</mat-card-actions>
 
 	</form>
+
+	<mat-progress-bar mode="indeterminate" class="valign-bottom" *ngIf="loading"></mat-progress-bar>
+
+
 </mat-card>
 
 
-<mat-card class="sm-centered-card" [@cardState] *ngIf="formState == 'complete'"> 
+<mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'complete'"> 
 		<mat-card-title>
 		  <span>Account Activation</span>
 		</mat-card-title>

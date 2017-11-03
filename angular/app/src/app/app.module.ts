@@ -9,27 +9,15 @@ import { MaterialModule } from './material.module';
 
 
 import { AuthenticationModule } from './modules/authentication/authentication.module';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthenticationInterceptor } from './modules/authentication/authentication-interceptor';
 
 
 import { AppComponent } from './app.component';
 
 
-/**
- * Import the the Interceptor that handles attaching the xsrf token header
- * when making calls to the Django backend during development. This is done 
- * because angular's default behaviour does not send the xsrf token when
- * making requests to another server. 
- */
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { DevHttpXsrfInterceptor } from './xsrf.interceptor';
-
-
 
 const appRoutes: Routes = [
-  // { path: 'register', component: RegisterComponent },
-  // { path: 'login', component: LoginComponent },
-  // { path: 'reset-password', component: ResetPasswordComponent },
-  // { path: 'activate/:key', component: UserActivationComponent }
 ];
 
 
@@ -55,7 +43,7 @@ const appRoutes: Routes = [
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: DevHttpXsrfInterceptor,
+      useClass: AuthenticationInterceptor,
       multi: true
     }
   ]

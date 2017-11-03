@@ -150,11 +150,67 @@ class MyModel(models.Model):
 python manage.py makemigrations app --empty
 
 
+### Todo
 
-### Resources
+Send Password Reset Emails DONE
 
-Sites, finding absolute url
+Perform Password Reset - Monday
+
+Perform Login - Tuesday
+
+Allow user to change email and password - Wednesday
+
+Material Icons from Local Host
+
+AOT
+
+i18n
+-----
+
+Writing Django Tests - Thursday
+
+Writing Angular Tests - Friday
+
+
+Move Django Authenitcation to a Reusable App - Monday/Tuesday
+
+Publish Django Authentication Module - Wednesday
+
+
+Move Angular Authentication to a Reusable App - Thursday/Friday
+
+Publish Angular Authentication Module - Saturday Nov-11
+
+-----
+
+Create Contacts Application
+
+Create Blog - Wednesday
+
+Create
+
+
+Create Oikos Application - C
+
+Create 
+
+
+## Resources
+
+### Django Sites, finding absolute url
+
 https://docs.djangoproject.com/en/1.11/ref/contrib/sites/
+
+### Django Authentication - JWT
+
+https://www.octobot.io/blog/2016-11-11-json-web-token-jwt-authentication-in-a-djangoangularjs-web-app/
+
+### Django Testing
+
+https://docs.djangoproject.com/en/1.11/topics/testing/overview/
+https://docs.djangoproject.com/en/1.11/topics/testing/overview/#running-tests
+https://docs.djangoproject.com/en/1.11/topics/testing/advanced/#testing-reusable-applications
+
 
 
 
