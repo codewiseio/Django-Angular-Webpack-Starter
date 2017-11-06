@@ -20,150 +20,32 @@ from .serializers import UserSerializer
 from .models import UserActivation, ResetPasswordRequest
 
 
-
-
-
-
-# Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
-    lookup_field = 'email'
+    """ Viewset that provides CRUD operations for user accounts
+    
+    Extends:
+        viewsets.ModelViewSet
+
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
     def get_permissions(self):
+        """ Set permission restrictions """
+
+        # allow not lgged in users to access safe methods
         if self.request.method in permissions.SAFE_METHODS:
             return(permissions.AllowAny(),)
         
+        # allow not logged in users to create accounts
         if self.request.method == 'POST':
             return(permissions.AllowAny(),)
         
+        # required user to be logged in and account owner
         return(permissions.IsAuthenticated(), IsAccountOwner(),)
     
-    def create(self,request):
-        """ Create a new user """
-        serializer = self.serializer_class(data=request.data)
-        
-        # check for existing account with given email
-        duplicate = User.objects.get(email=request.data.get('email'))
-        if duplicate:
-            return Response({
-                'status': 'Conflict',
-                'message': 'This email is already in use.',
-                'message-token': 'conflict-email'
-            }, status=status.HTTP_409_CONFLICT)
-        
-        # validate supplied data
-        if serializer.is_valid():
-            
-            # create account
-            User.objects.create_user(**serializer.validated_data)
-            return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
-        
-        # data not valid, return bad request response
-        return Response({
-            'status': 'Bad request',
-            'message': 'Account could not be created with received data.'
-        }, status=status.HTTP_400_BAD_REQUEST)
 
-class UserView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    @transaction.atomic
-    def update(self, request, *args, **kwargs):
-        """ Update user data. Ensure password is encrypted. """
-
-        # if a password was supplied
-        if request.data.get('password') :
-            user = User.objects.get(pk=kwargs['pk'])
-            # encrypt the password
-            user.set_password( request.data.get('password') )
-            # remove the password from the request data 
-            request.data.pop('password');
-
-        # perform update
-        serializer = self.get_serializer(user,data=request.data,partial=True)
-        if serializer.is_valid():
-            serializer.save();
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(request.data, status=status.HTTP_400_BAD_REQUEST)
-
-class LoginView(views.APIView):
-    def post(self, request, format=None):
-        
-        data = request.data
-        email = data.get('email', None)
-        password = data.get('password', None)
-
-        # authenticate the user
-        user = authenticate(email=email, password=password)
-
-        # user authenticated successfully
-        if user is not None:
-
-            # if user is active
-            if user.is_active:
-
-                # login
-                login(request, user)
-
-                # create an authentication token
-                jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-                jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-                
-                payload = jwt_payload_handler(user)
-                token = jwt_encode_handler(payload)
-
-                # create the response
-                response = UserSerializer(user).data
-                response['token'] = token
-                   
-                return Response( response, status=status.HTTP_200_OK );
-
-            # if user is not active
-            else:
-                return Response({
-                    'status': 'Unauthorized',
-                    'message': 'This user has been disabled.'
-                }, status=status.HTTP_401_UNAUTHORIZED)
-
-        # could not authenticate user
-        else:
-            return Response({
-                'status': 'Unauthorized',
-                'message': 'Email/password combination invalid.'
-            }, status=status.HTTP_401_UNAUTHORIZED)
-
-
-            
-    
-class LogoutView(views.APIView):
-    # permission_classes = (permissions.IsAuthenticated,)
-    
-    def post(self, request, format=None):
-        print('Logout')
-        logout(request)
-        
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
-    
-    
-
-class RegisterView(views.APIView):
-    """ Register a new user
-    
-    Accepts an email address and password as post data and creates a new user account.
-    Sends an email to the user to activate the account before permitting login.
-    
-    Extends:
-        generics.CreateAPIView
-    
-    Variables:
-        serializer_class (class): Serializer to transform data
-    """
-    serializer_class = UserSerializer
-    
-    def post(self,request):
+    def create(self,request):    
         """ Perform account registration
             
         Accepts an email address and password as post data and creates a new user account.
@@ -207,6 +89,37 @@ class RegisterView(views.APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
+    def list(self,request):
+
+        queryset = self.get_queryset()
+
+        if request.GET.get('email'):
+            queryset = queryset.filter(email=request.GET.get('email'))
+
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+    def partial_update(self, request, pk=None):
+        """ Update user data. Ensure password is encrypted. """
+
+        # if a password was supplied
+        if request.data.get('password') :
+            user = User.objects.get(pk=kwargs['pk'])
+            # encrypt the password
+            user.set_password( request.data.get('password') )
+            # remove the password from the request data 
+            request.data.pop('password');
+
+        # perform update
+        serializer = self.get_serializer(user,data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save();
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(request.data, status=status.HTTP_400_BAD_REQUEST)
+
 
     def dispatch_activation_email(self, user, request):
         """ Send the activation email to the user when the database record is created.
@@ -236,28 +149,88 @@ class RegisterView(views.APIView):
         )
 
 
-class ActivateUserView(views.APIView):
-    """ Activate a new account
-    
-    After registering, new accounts are sent an activation link via email.
-    This view handles validation of these links and sets new accounts to 
-    active.
-
-    Allows GET requests with a 'key' parameter.
-
-    Status:
-        200: Account activated
-        400: Could not activate account with given key
-        409: Account is already active
-    
-    Extends:
-        views.APIView    
+class AuthenticationView(views.APIView):
+    """ Handles authentication (logging in and out)
     """
-    @transaction.atomic
-    def get(self,request,*args, **kwargs):
 
-        # get key from uri
-        key = self.kwargs.get('key')
+    def post(self, request, format=None):
+        """ Sign in to a user account .
+
+        Returns a response with an authentication token
+        """
+        data = request.data
+        email = data.get('email', None)
+        password = data.get('password', None)
+
+        # authenticate the user
+        user = authenticate(email=email, password=password)
+
+        # user authenticated successfully
+        if user is not None:
+
+            # if user is active
+            if user.is_active:
+
+                # login
+                login(request, user)
+
+                # create an authentication token
+                jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+                jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+                
+                payload = jwt_payload_handler(user)
+                token = jwt_encode_handler(payload)
+
+                # create the response
+                response = UserSerializer(user).data
+                response['token'] = token
+                   
+                return Response( response, status=status.HTTP_200_OK );
+
+            # if user is not active
+            else:
+                return Response({
+                    'status': 'Unauthorized',
+                    'message': 'This user has been disabled.'
+                }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # could not authenticate user
+        else:
+            return Response({
+                'status': 'Unauthorized',
+                'message': 'Email/password combination invalid.'
+            }, status=status.HTTP_401_UNAUTHORIZED)    
+
+
+    def delete(self, request, *args, **kwargs):
+        """ Destroy a users authentication token, effectively signing out.
+        """
+
+        # If a user is signed in
+        if request.user.is_authenticated():
+            # sign out
+            logout(request)
+            return Response({}, status=status.HTTP_204_NO_CONTENT) 
+        
+        # otherwise respond with bad request
+        else:
+            # Do something for anonymous users.
+            return Response({
+                'status': 'Bad request',
+                'message': 'There is no authenticated user to sign out.'
+            }, status=status.HTTP_400_BAD_REQUEST)  
+
+
+    def patch(self,request,*args,**kwargs):
+        """ Activate a user account
+        """
+
+        key = request.data.get('key')
+        if key == None:
+            return Response({
+                    'status': 'fail',
+                    'message': 'Could not activate account',
+                },  status=status.HTTP_400_BAD_REQUEST);
 
         # perform key lookup
         results = UserActivation.objects.filter(key=key).all()
@@ -268,12 +241,22 @@ class ActivateUserView(views.APIView):
                     'status': 'fail',
                     'message': 'Could not activate account',
                 },  status=status.HTTP_400_BAD_REQUEST);
+
+        # user has been banned
+        elif results[0] and results[0].user.status < 0:
+            return Response({
+                    'status': 'fail',
+                    'message': 'This account has been disabled.',
+                },  status=status.HTTP_400_BAD_REQUEST);              
+
         # found activation key, but user is already activated
         elif results[0] and results[0].activated:
             return Response({
                     'status': 'fail',
-                    'message': 'This account has already been activated with this link.',
+                    'message': 'This account has already been activated.',
                 },  status=status.HTTP_409_CONFLICT);   
+
+
         # found activation key, activate account
         else:
             activation = results[0]
@@ -286,6 +269,8 @@ class ActivateUserView(views.APIView):
                     'status': 'succes',
                     'message': 'This account is now active.',
                 },  status=status.HTTP_200_OK); 
+
+
 
     
 
@@ -313,10 +298,10 @@ class ResetPasswordRequestView(views.APIView):
         views.APIView    
     """
     @transaction.atomic
-    def get(self,request,*args, **kwargs):
+    def post(self,request,*args, **kwargs):
 
         # get key from uri
-        email = request.GET.get('email')
+        email = request.data.get('email')
 
         # find user with given email
         user = User.objects.filter(email=email).all()
@@ -332,58 +317,40 @@ class ResetPasswordRequestView(views.APIView):
         else:
             user = user[0]
 
+        # if user has been disabled, throw an error
+        if user.status == User.DISABLED:
+            return Response({
+                    'status': 'fail',
+                    'message': 'This account has been disabled.',
+                },  status=status.HTTP_404_BAD_REQUEST);
+        
+        # check if there is another password reset request sent in the past 30 minutes
+        # TODO: Allow minutes to be configured via settings module
+        time_threshold = timezone.now() - timedelta(minutes=30)
+        results = ResetPasswordRequest.objects.filter(user=user,status=ResetPasswordRequest.ACTIVE, created__gt=time_threshold).order_by('-id')
+                
+        # if active request, use the same request link
+        if len(results) > 0:
+            instance = results[0]
+
+        # if no active request, create a new request link
+        else:
+            instance = ResetPasswordRequest.objects.create(user=user)
+
         # create password reset instance
-        instance = ResetPasswordRequest.objects.create(user=user)
         self.dispatch_email(instance, request)
 
         return Response({
                 'status': 'succes',
-                'message': 'Password reset email dispatched.',
+                'message': 'A link to reset your password has been sent to this email address.',
             },  status=status.HTTP_200_OK); 
 
 
 
 
-    def dispatch_email(self, instance, request):
-        """ Send an email to the user containing a link to reset their password.
-
-        Args:
-            instance (object): The ResetPasswordRequest instance
-            request (object): The request object
-        """
-
-        # create the link
-        current_site = get_current_site(request)
-        link = 'http://{}/reset-password/{}'.format(current_site.domain, instance.key)
-
-        # dispatch the email
-        send_mail(
-            'Password Reset',
-            'Reset your password by following this link \n\n{}\n\n-'.format(link),
-            'test@example.com',
-            [instance.user.email],
-            fail_silently=False
-            )
-
-
-
-
-class ResetPasswordView(views.APIView):
-    """ Perform a password reset
-    
-    Modify a user's password after they have followed the password reset link
-    sent to their email address. Verification is done using the unique code
-    included in the uri.
-
-    Requests:
-        POST
-
-
-    Extends:
-        views.APIView    
-    """
-
     def get(self,request,*args, **kwargs):
+        """ Check a reset password request for valididy and expiration
+        """
 
         # get key from uri
         key = self.kwargs.get('key')
@@ -406,15 +373,16 @@ class ResetPasswordView(views.APIView):
                     'message': 'This link is no longer valid.'
                 }, status=status.HTTP_401_UNAUTHORIZED);
 
+        # TODO: return error if link is expired
+
         # confirm password reset link is valid
         else:
             return Response({
                     'status': 'ok'
                 }, status=status.HTTP_200_OK);
 
-
     @transaction.atomic
-    def post(self,request,*args, **kwargs):
+    def patch(self,request,*args, **kwargs):
         """Peform the password reset.
         
         Decorators:
@@ -444,15 +412,28 @@ class ResetPasswordView(views.APIView):
                 }, status=status.HTTP_404_NOT_FOUND);
 
         # return error if link has been used already or is disabled
-        if instance.status == ResetPasswordRequest.USED or instance.status == ResetPasswordRequest.DISABLED:
+        if instance.status == ResetPasswordRequest.USED:
+            return Response({
+                    'status': 'fail',
+                    'message': 'This link has expired.'
+                }, status=status.HTTP_410_GONE);
 
+        elif instance.status == ResetPasswordRequest.DISABLED:
             return Response({
                     'status': 'used',
-                    'message': 'This link is no longer valid.'
+                    'message': 'This link has been disabled.'
                 }, status=status.HTTP_401_UNAUTHORIZED);
 
+        # return error if link has expired
+        # TODO: Load expiration time from settings
+        elif instance.created < timezone.now() - timedelta(minutes=30):
+            return Response({
+                    'status': 'fail',
+                    'message': 'This link has expired.'
+                }, status=status.HTTP_410_GONE);
+
         # return error if user did not supply a password
-        elif request.data.get('password', None) == None:
+        if request.data.get('password', None) == None or request.data.get('password') == "":
             return Response({
                     'status': 'fail',
                     'message': 'No password set.'
@@ -473,6 +454,29 @@ class ResetPasswordView(views.APIView):
                 'status': 'success',
                 'message': 'Password has been changed.'
             }, status=status.HTTP_200_OK);
+
+
+
+    def dispatch_email(self, instance, request):
+        """ Send an email to the user containing a link to reset their password.
+
+        Args:
+            instance (object): The ResetPasswordRequest instance
+            request (object): The request object
+        """
+
+        # create the link
+        current_site = get_current_site(request)
+        link = 'http://{}/reset-password/{}'.format(current_site.domain, instance.key)
+
+        # dispatch the email
+        send_mail(
+            'Password Reset',
+            'Reset your password by following this link \n\n{}\n\n-'.format(link),
+            'test@example.com',
+            [instance.user.email],
+            fail_silently=False
+            )
 
 
 

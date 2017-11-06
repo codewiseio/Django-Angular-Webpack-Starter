@@ -56,7 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     email        = models.EmailField(unique=True)
     is_superuser = models.BooleanField(default=False,help_text="Designates whether user can log into the backend.")
-    status      = models.SmallIntegerField(choices=STATUS_CHOICES,blank=False,null=False,default=0 if AUTHENTICATION.get('REGISTRATION_REQUIRE_ACTIVATION') else 1)
+    status      = models.SmallIntegerField(choices=STATUS_CHOICES,blank=False,null=False,default=0 )
     last_login  = models.DateTimeField(blank=True,null=True)
     
     created     = models.DateTimeField(auto_now_add=True,blank=True,null=True)

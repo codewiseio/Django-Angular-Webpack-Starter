@@ -28,13 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTHENTICATION = {
-    'REGISTRATION_REQUIRE_ACTIVATION': True,
-    'REGISTRATION_OPEN_REGISTRATION': True,
-    'REGISTRATION_USERNAMES': False
-}
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -163,6 +156,7 @@ AUTH_USER_MODEL = 'authentication.User'
 
 
 REST_FRAMEWORK = {
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
   #  Uncomment to force all pages to require authentication
   # 'DEFAULT_AUTHENTICATION_CLASSES': (
   #   'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
@@ -193,6 +187,13 @@ CORS_ALLOW_HEADERS = (
 CORS_EXPOSE_HEADERS = (
     'Set-Cookie',
 )
+
+AUTHENTICATION = {
+    'REQUIRE_ACTIVATION': True,
+    'OPEN_REGISTRATION': True,
+    'USERNAMES': False
+}
+
 
 
 import os.path
