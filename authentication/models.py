@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from .settings import AUTHENTICATION
 
 # for random string generation
 import string
@@ -55,8 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     email        = models.EmailField(unique=True)
     is_superuser = models.BooleanField(default=False,help_text="Designates whether user can log into the backend.")
-    is_active   = models.BooleanField(default=True,help_text="Designates whether user is active or not")
-    status      = models.SmallIntegerField(choices=STATUS_CHOICES,blank=False,null=False,default=0)
+    status      = models.SmallIntegerField(choices=STATUS_CHOICES,blank=False,null=False,default=0 if AUTHENTICATION.get('REGISTRATION_REQUIRE_ACTIVATION') else 1)
     last_login  = models.DateTimeField(blank=True,null=True)
     
     created     = models.DateTimeField(auto_now_add=True,blank=True,null=True)
@@ -74,6 +74,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_staff(self):
       return self.is_superuser
+
+    @property
+    def is_active(self):
+        return True if self.status == 1 else False;
     
     def get_short_name(self):
         self.email;

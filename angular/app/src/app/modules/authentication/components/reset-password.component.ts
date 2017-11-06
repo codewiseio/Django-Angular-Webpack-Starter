@@ -5,7 +5,7 @@ import { FormGroup, FormControl, Validators} from '@angular/forms';
 import { AuthenticationService } from '../services/authentication.service';
 import { trigger, state, style, transition, animate } from '@angular/core';
 
-import { slideIn, shrinkOut } from '../animations';
+import { slideIn, shrinkOut } from '../../../animations';
 
 
 @Component({

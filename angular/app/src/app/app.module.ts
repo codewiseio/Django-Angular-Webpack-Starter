@@ -7,18 +7,29 @@ import { HttpClientModule }    from '@angular/common/http';
 
 import { MaterialModule } from './material.module';
 
-
-import { AuthenticationModule } from './modules/authentication/authentication.module';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthenticationInterceptor } from './modules/authentication/authentication-interceptor';
-
-
 import { AppComponent } from './app.component';
 
+/** 
+ * Authentication Module
+ * Contains components for user registration and authentication
+ */
+import { AuthenticationModule } from './modules/authentication/authentication.module';
+
+/* Interceptor sends JWT Token on all requests */
+import { AuthenticationInterceptor } from './modules/authentication/authentication-interceptor';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+
+// How I want Authentication to be included
+// import { AuthenticationModule, AuthenticationInterceptor, AuthenticationRoutes } from '@agape/authentication';
+// import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 
-const appRoutes: Routes = [
-];
+/**
+ * Home Module
+ */
+import { HomeModule } from './modules/home/home.module';
+
+const appRoutes: Routes = [];
 
 
 @NgModule({
@@ -31,6 +42,7 @@ const appRoutes: Routes = [
     MaterialModule,
 
     AuthenticationModule,
+    HomeModule,
     RouterModule.forRoot(
       appRoutes,
       { enableTracing: true } // <-- debugging purposes only

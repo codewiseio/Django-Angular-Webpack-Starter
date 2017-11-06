@@ -3,7 +3,7 @@ import { FormGroup, FormControl, Validators} from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
 
-import { slideIn, slideOut, shrinkOut } from '../animations';
+import { slideIn, slideOut, shrinkOut } from '../../../animations';
 import { AuthenticationService } from '../services/authentication.service';
 
 @Component({

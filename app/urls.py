@@ -10,6 +10,7 @@ from authentication.views import LoginView, RegisterView, ValidateEmailView, Act
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    #agape.authentication.urls('api/v1'),
     url(r'^api/v1/login/$', LoginView.as_view(), name='login'),
 	url(r'^api/v1/register/$', RegisterView.as_view(), name='register'),
 	url(r'^api/v1/register/validate-email/?$', ValidateEmailView.as_view(), name='validate-email'),

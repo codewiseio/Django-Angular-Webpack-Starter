@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { AuthenticationService } from '../services/authentication.service';
 import { trigger, state, style, transition, animate } from '@angular/core';
-import { slideIn, shrinkOut } from '../animations';
+import { slideIn, shrinkOut } from '../../../animations';
 
 @Component({
   templateUrl: './user-activation.component.html',

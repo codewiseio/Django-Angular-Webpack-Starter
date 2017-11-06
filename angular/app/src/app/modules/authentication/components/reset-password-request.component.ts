@@ -3,7 +3,7 @@ import { trigger, state, style, transition, animate } from '@angular/core';
 import { FormGroup, FormControl, Validators} from '@angular/forms';
 import { AuthenticationService } from '../services/authentication.service';
 
-import { slideIn, slideOut, shrinkOut } from '../animations';
+import { slideIn, slideOut, shrinkOut } from '../../../animations';
 
 
 const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
