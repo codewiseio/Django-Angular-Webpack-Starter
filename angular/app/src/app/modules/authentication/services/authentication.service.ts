@@ -28,7 +28,7 @@ export class AuthenticationService {
   	if ( userid )
   	 	params = params.set('userid', userid.toString() );
 
-    	return this.http.get(`${this.api}/register/validate-email/`, { params: params } );
+    	return this.http.get(`${this.api}/users/`, { params: params } );
   }
 
   login(data: {username: string, password: string} ) {
@@ -36,7 +36,7 @@ export class AuthenticationService {
       let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
       return this.http
-        .post(`${this.api}/login/`, data, { headers: headers } )
+        .post(`${this.api}/authentication/`, data, { headers: headers } )
            .toPromise()
            .then(
              (response: any) => {
@@ -60,7 +60,7 @@ export class AuthenticationService {
       let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     	return this.http
-        .post(`${this.api}/register/`, JSON.stringify(user), { headers: headers } )
+        .post(`${this.api}/user/`, JSON.stringify(user), { headers: headers } )
            .toPromise()
            .then(response => response as User[])
   }
@@ -74,10 +74,8 @@ export class AuthenticationService {
    * @return {Observable<any>}       
    */
   resetPasswordRequest(email: string): Observable<any> {
-    	let params = new HttpParams().set('email', email );
-
     	return this.http
-        .get(`${this.api}/reset-password/`, { params: params } );
+        .post(`${this.api}/authentication/password/`, { email: email });
   }
 
   /**
@@ -87,7 +85,7 @@ export class AuthenticationService {
    */
   validateResetPasswordRequest(key: string): Observable<any> {
     return this.http
-        .get(`${this.api}/reset-password/${key}`);
+        .get(`${this.api}/authentication/password/${key}/`);
   }
 
 
@@ -99,7 +97,7 @@ export class AuthenticationService {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     return this.http
-      .post(`${this.api}/reset-password/${key}/`, {password: password},  { headers: headers } );
+      .patch(`${this.api}/reset-password/${key}/`, {password: password},  { headers: headers } );
   }
 
   /**

@@ -156,12 +156,12 @@ class ResetPasswordRequest(models.Model):
 
 
     DISABLED = -1
-    ACTIVE = 1
+    ENABLED = 1
     USED = 2
     STATUS_CHOICES = (
         ("", '-- select --'),
         (DISABLED, 'Disabled'),
-        (ACTIVE, 'Active'),
+        (ENABLED, 'Active'),
         (USED, 'Used'),
     )
 

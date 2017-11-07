@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
         confirm_password = validated_data.get('confirm_password', None)
 
         # create the instance
-        instance = User(email=validated_data['email'])
+        instance = User(email=validated_data['email'],status=validated_data['status'])
 
         # set the password
         instance = self.set_password(instance, password, confirm_password)
@@ -34,9 +34,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.email = validated_data.get('email', instance.email)
+        password = validated_data.get('password', None)
 
         # set the password
-        instance = self.set_password(instance, password, confirm_password)
+        instance = self.set_password(instance,password,password)
 
         # save
         instance.save()  

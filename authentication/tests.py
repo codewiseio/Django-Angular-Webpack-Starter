@@ -7,6 +7,7 @@ from datetime import timedelta
 
 # Create your tests here.
 from .models import User, UserActivation, ResetPasswordRequest
+from .settings import AUTHENTICATION
 
 class UserTestCase(TestCase):
     def setUp(self):
@@ -78,6 +79,20 @@ class APITestCase(TestCase):
     response = self.client.delete('/api/v1/authentication/')
     self.assertEqual(response.status_code, 204, "Sign out successful")
 
+  def test_register_without_user_activation(self):
+    AUTHENTICATION['REQUIRE_ACTIVATION'] = False
+
+    # register user
+    response = self.client.post('/api/v1/users/', {'email': 'testing@example.com', 'password':'testing'})
+    self.assertEqual(response.status_code, 201, "Created new user")
+    
+    # get user, verify that user is not active
+    user = User.objects.get(email="testing@example.com")
+    self.assertEqual(user.status, 1, "New user active")
+
+    AUTHENTICATION['REQUIRE_ACTIVATION'] = True
+
+
   def test_authenticate_disabled_account_error(self):
     # register user
     response = self.client.post('/api/v1/users/', {'email': 'testing@example.com', 'password':'testing'})
@@ -126,6 +141,10 @@ class APITestCase(TestCase):
     instance = ResetPasswordRequest.objects.filter(user=user).order_by('-id')[0]
     self.assertTrue(instance, "Reset password request object exists")
 
+    # check password reset link is valid
+    response = self.client.get('/api/v1/authentication/password/{}/'.format(instance.key))
+    self.assertEqual(response.status_code, 200, "Validate password reset link ok")   
+    
     # try creating another password reset and verify that they have the same key
     response = self.client.post('/api/v1/authentication/password/', {'email': 'testing@example.com', 'reset': True})
     duplicate = ResetPasswordRequest.objects.filter(user=user).order_by('-id')[0]
@@ -133,22 +152,31 @@ class APITestCase(TestCase):
 
     # update the original reset request to be over an hour old
     duplicate = None
-    time_threshold = timezone.now() - timedelta(minutes=60)
+    time_threshold = timezone.now() - timedelta(minutes=AUTHENTICATION.get('RESET_PASSWORD_EXPIRES')+1)
     instance.created = time_threshold
     instance.save()
+
+    # check password reset link is now expired
+    response = self.client.get('/api/v1/authentication/password/{}/'.format(instance.key))
+    self.assertEqual(response.status_code, 410, "Password link has expired")
+
+    # reset the password using the expired link (should fail)
+    response = self.client.patch('/api/v1/authentication/password/{}/'.format(instance.key), json.dumps({'password': 'newpass'}), content_type='application/json')
+    self.assertEqual(response.status_code, 410, "Do not reset password on expired link")
+
 
     # create another password reset and verify that they have different keys
     response = self.client.post('/api/v1/authentication/password/', {'email': 'testing@example.com', 'reset': True})
     duplicate = ResetPasswordRequest.objects.filter(user=user).order_by('-id')[0]
     self.assertTrue(not instance.key == duplicate.key, "Created new password reset request") 
 
-    # reset the password using the expired link (should fail)
-    response = self.client.patch('/api/v1/authentication/password/{}/'.format(instance.key), json.dumps({'password': 'newpass'}), content_type='application/json')
-    self.assertEqual(response.status_code, 410, "Do not reset password on expired link")
-
     # reset the password using the new link (should pass)
     response = self.client.patch('/api/v1/authentication/password/{}/'.format(duplicate.key), json.dumps({'password': 'newpass'}), content_type='application/json')
     self.assertEqual(response.status_code, 200, "Reset password on valid link")
+
+    # check password reset link is now expired (has been used)
+    response = self.client.get('/api/v1/authentication/password/{}/'.format(instance.key))
+    self.assertEqual(response.status_code, 410, "Password link has been used")
 
     # reset the password using the new link again (should fail)  
     response = self.client.patch('/api/v1/authentication/password/{}/'.format(duplicate.key), json.dumps({'password': 'newpass'}), content_type='application/json')
@@ -166,16 +194,109 @@ class APITestCase(TestCase):
     response = self.client.patch('/api/v1/authentication/password/{}/'.format(another.key), json.dumps({'password': ''}), content_type='application/json')
     self.assertEqual(response.status_code, 400, "No password supplied error")
 
+    # set the new link to disabled
+    another.status = ResetPasswordRequest.DISABLED
+    another.save()
+
+    # check password reset link is now disabled
+    response = self.client.get('/api/v1/authentication/password/{}/'.format(another.key))
+    self.assertEqual(response.status_code, 401, "Link has been disabled")
+
+    # try resetting password on disbaled link
+    response = self.client.patch('/api/v1/authentication/password/{}/'.format(another.key), json.dumps({'password': 'newpass'}), content_type='application/json')
+    self.assertEqual(response.status_code, 401, "Link has been disabled")
+
+    # set the new link to enabled
+    another.status = ResetPasswordRequest.ENABLED
+    another.save()
+
+    # set the user to disabled
+    another.user.status = User.DISABLED
+    another.user.save()
+
+    # check password reset link is now disabled
+    response = self.client.get('/api/v1/authentication/password/{}/'.format(another.key))
+    self.assertEqual(response.status_code, 401, "User has been disabled")
+
+    # try resetting password on disbaled link
+    response = self.client.patch('/api/v1/authentication/password/{}/'.format(another.key), json.dumps({'password': 'newpass'}), content_type='application/json')
+    self.assertEqual(response.status_code, 401, "User has been disabled")    
+
+
+
   def test_validate_email(self):
 
     # check if email is available ( yes available )
-    response = self.client.get('/api/v1/users/?email=testing@example.com')
-    self.assertEqual(len(response.data), 0, "No conflict")
+    response = self.client.get('/api/v1/authentication/email/?email=testing@example.com')
+    self.assertEqual(response.data.get('valid'), True, "No conflict")
 
     # register user
     response = self.client.post('/api/v1/users/', {'email': 'testing@example.com', 'password':'testing'})
     self.assertEqual(response.status_code, 201, "Created new user")    
+
+
+    user = User.objects.get(email="testing@example.com")
   
     # check if email is available ( no, in use )
-    response = self.client.get('/api/v1/users/?email=testing@example.com')
-    self.assertEqual(len(response.data), 1, "Conflict")
+    response = self.client.get('/api/v1/authentication/email/?email=testing@example.com')
+    self.assertEqual(response.data.get('valid'), False, "Conflict")
+
+    # check if email is available ( yes, do not flag users email as invalid )
+    response = self.client.get('/api/v1/authentication/email/?email=testing@example.com&userid={}'.format(user.id))
+    self.assertEqual(response.data.get('valid'), True, "No conflict")
+
+  def test_change_credentials(self):
+
+    # create a user
+    client =  APIClient()
+    response = client.post('/api/v1/users/', {'email': 'testing@example.com', 'password':'testing'})
+    self.assertEqual(response.status_code, 201, "Created new user")
+
+    user = User.objects.get(email="testing@example.com")
+    user.status = 1;
+    user.save()
+
+    # login
+    response = client.post('/api/v1/authentication/', {'email': 'testing@example.com', 'password':'testing'})
+    self.assertEqual(response.status_code, 200, "Signed in")
+    client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data.get('token'))
+    
+    # update password
+    userid = response.data.get('id')    
+    response = client.patch('/api/v1/users/{}/'.format(userid), json.dumps({'password':'newpass','current_password':'testing'}), content_type='application/json')
+    self.assertEqual(response.status_code, 200, "Updated password")    
+
+    # update email
+    userid = response.data.get('id')    
+    response = client.patch('/api/v1/users/{}/'.format(userid), json.dumps({'email':'updated@example.com','current_password':'newpass'}), content_type='application/json')
+    self.assertEqual(response.status_code, 200, "Updated password")   
+
+    # login with new credentials
+    response = client.post('/api/v1/authentication/', {'email': 'updated@example.com', 'password':'newpass'})
+    self.assertEqual(response.status_code, 200, "Signed in")
+    client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data.get('token'))
+
+
+
+  def test_last_login(self):
+
+    AUTHENTICATION['REQUIRE_ACTIVATION'] = False
+
+    # create a user
+    client =  APIClient()
+    response = client.post('/api/v1/users/', {'email': 'testing@example.com', 'password':'testing'})
+    self.assertEqual(response.status_code, 201, "Created new user")
+
+    # verify last login is blank
+    user = User.objects.get(email="testing@example.com")
+    self.assertEqual(user.last_login, None, "User has never logged in")
+
+    # login
+    response = client.post('/api/v1/authentication/', {'email': 'testing@example.com', 'password':'testing'})
+    self.assertEqual(response.status_code, 200, "Signed in")
+
+    # verify last login is not blank
+    user = User.objects.get(email="testing@example.com")
+    self.assertTrue(user.last_login, "User has logged in")
+
+    AUTHENTICATION['REQUIRE_ACTIVATION'] = True

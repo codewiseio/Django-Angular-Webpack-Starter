@@ -18,6 +18,7 @@ from datetime import timedelta
 from .permissions import IsAccountOwner
 from .serializers import UserSerializer
 from .models import UserActivation, ResetPasswordRequest
+from .settings import AUTHENTICATION
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -52,8 +53,7 @@ class UserViewSet(viewsets.ModelViewSet):
         Sends an email to the user to activate the account before permitting login.
         """
 
-        """ Create a new user """
-        serializer = self.serializer_class(data=request.data)
+
         
         # check for existing account with given email
         try:
@@ -67,12 +67,23 @@ class UserViewSet(viewsets.ModelViewSet):
         except:
             pass
 
+        # create the user
+        data = request.data.copy()
+
+        # set default user status
+        data['status'] = 0 if AUTHENTICATION['REQUIRE_ACTIVATION'] else 1
+        serializer = self.serializer_class(data=data)
+
         # validate supplied data
         if serializer.is_valid():
             
             # create the user account
             instance =  serializer.save()
-            self.dispatch_activation_email(instance,request)
+
+            # if account requires activation
+            if AUTHENTICATION['REQUIRE_ACTIVATION']:
+                # create and send the activation link
+                self.dispatch_activation_email(instance,request)
 
             # remove password data from response
             response = serializer.validated_data
@@ -89,28 +100,39 @@ class UserViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-    def list(self,request):
-
-        queryset = self.get_queryset()
-
-        if request.GET.get('email'):
-            queryset = queryset.filter(email=request.GET.get('email'))
-
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 
     def partial_update(self, request, pk=None):
         """ Update user data. Ensure password is encrypted. """
 
+        # confirm current password to commit credential changes
+        if request.data.get('current_password') and not request.data.get('current_password') == "":
+            user = User.objects.get(pk=pk)
+            
+            # authenticate the password
+            auth = authenticate(email=user.email, password=request.data.get('current_password'))
+
+        # throw error if current password not given
+        else:
+            return Response({
+                'status': 'Password required',
+                'message': 'Current password required.'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+
         # if a password was supplied
-        if request.data.get('password') :
-            user = User.objects.get(pk=kwargs['pk'])
-            # encrypt the password
-            user.set_password( request.data.get('password') )
-            # remove the password from the request data 
-            request.data.pop('password');
+        if request.data.get('password') and not request.data.get('password') == "":
+
+            if auth:
+                # encrypt the password
+                user.set_password( request.data.get('password') )
+                # remove the password from the request data 
+                request.data.pop('password');
+            else:
+                return Response({
+                    'status': 'Invalid password',
+                    'message': 'Current password required.'
+                }, status=status.HTTP_401_UNAUTHORIZED)     
+
 
         # perform update
         serializer = self.get_serializer(user,data=request.data,partial=True)
@@ -173,6 +195,8 @@ class AuthenticationView(views.APIView):
 
                 # login
                 login(request, user)
+                user.last_login = timezone.now()
+                user.save()
 
                 # create an authentication token
                 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -277,28 +301,20 @@ class AuthenticationView(views.APIView):
 class ResetPasswordRequestView(views.APIView):
     """ Send a password reset link to a user via email
     
-    The view takes a user email address as a paramter. Will send a password
-    reset link if no other request has been issued in the past 15 minutes.
-    Invalidates any other outstanding password reset requests. Password reset
-    links are only valid for 30 minutes.
+    Will send a password eset link if no other request has been issued in the 
+    past X minutes. Password reset links are only valid for the number of minutes
+    specified in the configuration file. Defaults to 30.
 
-    Requests:
-        GET
-
-    Parameters:
-        email (string): Email address of registered user
-
-    Status:
-        200: Password reset link sent
-        404: User does not exist
-        409: Already requested a password reset link in the past 15 minutes
-
-    
     Extends:
         views.APIView    
     """
     @transaction.atomic
     def post(self,request,*args, **kwargs):
+        """ Create a new reset password request. 
+
+        Generates a new unique key which can be used to reset a users password. Sends
+        an email containing a password reset link to the specified user.
+        """
 
         # get key from uri
         email = request.data.get('email')
@@ -326,8 +342,8 @@ class ResetPasswordRequestView(views.APIView):
         
         # check if there is another password reset request sent in the past 30 minutes
         # TODO: Allow minutes to be configured via settings module
-        time_threshold = timezone.now() - timedelta(minutes=30)
-        results = ResetPasswordRequest.objects.filter(user=user,status=ResetPasswordRequest.ACTIVE, created__gt=time_threshold).order_by('-id')
+        time_threshold = timezone.now() - timedelta(minutes=AUTHENTICATION.get('RESET_PASSWORD_EXPIRES'))
+        results = ResetPasswordRequest.objects.filter(user=user,status=ResetPasswordRequest.ENABLED, created__gt=time_threshold).order_by('-id')
                 
         # if active request, use the same request link
         if len(results) > 0:
@@ -355,31 +371,19 @@ class ResetPasswordRequestView(views.APIView):
         # get key from uri
         key = self.kwargs.get('key')
 
-        # get user from password reset items
-        try:
-            instance = ResetPasswordRequest.objects.get(key=key)
-        except:
-            # return 404 if no matching reset request
-            return Response({
-                    'status': 'fail',
-                    'message': 'This link is not valid.'
-                }, status=status.HTTP_404_NOT_FOUND);
+        # check key for validity
+        response = self.validate_key(key)
 
-        # return error if link has been used already or is disabled
-        if instance.status == ResetPasswordRequest.USED or instance.status == ResetPasswordRequest.DISABLED:
-
-            return Response({
-                    'status': 'used',
-                    'message': 'This link is no longer valid.'
-                }, status=status.HTTP_401_UNAUTHORIZED);
-
-        # TODO: return error if link is expired
-
-        # confirm password reset link is valid
+        # if received Response, invalid key
+        if isinstance(response, Response):
+            # return the response
+            return response
+        # otherwise, confirm password reset link is valid
         else:
             return Response({
                     'status': 'ok'
                 }, status=status.HTTP_200_OK);
+
 
     @transaction.atomic
     def patch(self,request,*args, **kwargs):
@@ -401,36 +405,16 @@ class ResetPasswordRequestView(views.APIView):
         # get key from uri
         key = self.kwargs.get('key')
 
-        # get user from password reset items
-        try:
-            instance = ResetPasswordRequest.objects.get(key=key)
-        except:
-            # return 404 if no matching reset request
-            return Response({
-                    'status': 'fail',
-                    'message': 'This link is not valid.'
-                }, status=status.HTTP_404_NOT_FOUND);
+        # check key for validity
+        response = self.validate_key(key)
 
-        # return error if link has been used already or is disabled
-        if instance.status == ResetPasswordRequest.USED:
-            return Response({
-                    'status': 'fail',
-                    'message': 'This link has expired.'
-                }, status=status.HTTP_410_GONE);
-
-        elif instance.status == ResetPasswordRequest.DISABLED:
-            return Response({
-                    'status': 'used',
-                    'message': 'This link has been disabled.'
-                }, status=status.HTTP_401_UNAUTHORIZED);
-
-        # return error if link has expired
-        # TODO: Load expiration time from settings
-        elif instance.created < timezone.now() - timedelta(minutes=30):
-            return Response({
-                    'status': 'fail',
-                    'message': 'This link has expired.'
-                }, status=status.HTTP_410_GONE);
+        # if received Response, invalid key
+        if isinstance(response, Response):
+            # return the response
+            return response
+        # otherwise, we have a ResetPasswordRequest
+        else:
+            instance = response
 
         # return error if user did not supply a password
         if request.data.get('password', None) == None or request.data.get('password') == "":
@@ -456,6 +440,55 @@ class ResetPasswordRequestView(views.APIView):
             }, status=status.HTTP_200_OK);
 
 
+    def validate_key(self,key):
+        """ Check a key for validity.
+
+        Checks that key exists, has not been disabled, and is not expired.
+
+        Returns:
+            Response object for invalid keys
+            ResetPasswordRequest for valid keys
+        """
+
+        # get user from password reset items
+        try:
+            instance = ResetPasswordRequest.objects.get(key=key)
+        except:
+            # return 404 if no matching reset request
+            return Response({
+                    'status': 'fail',
+                    'message': 'This link is not valid.'
+                }, status=status.HTTP_404_NOT_FOUND);
+
+        # return error if link has been used already or is disabled
+        if instance.status == ResetPasswordRequest.USED:
+            return Response({
+                    'status': 'fail',
+                    'message': 'This link has expired.'
+                }, status=status.HTTP_410_GONE);
+
+        elif instance.status == ResetPasswordRequest.DISABLED:
+            return Response({
+                    'status': 'used',
+                    'message': 'This link has been disabled.'
+                }, status=status.HTTP_401_UNAUTHORIZED);
+
+        # return error if link has expired
+        elif instance.created < timezone.now() - timedelta(minutes=AUTHENTICATION.get('RESET_PASSWORD_EXPIRES')):
+            return Response({
+                    'status': 'fail',
+                    'message': 'This link has expired.'
+                }, status=status.HTTP_410_GONE);
+
+        # check that user is not disabled
+        elif instance.user.status == User.DISABLED:
+            return Response({
+                    'status': 'fail',
+                    'message': 'This account has been disabled.',
+                },  status=status.HTTP_401_UNAUTHORIZED);
+
+        else:
+            return instance
 
     def dispatch_email(self, instance, request):
         """ Send an email to the user containing a link to reset their password.
@@ -478,22 +511,11 @@ class ResetPasswordRequestView(views.APIView):
             fail_silently=False
             )
 
-
-
-
-
-
-
-
-
-
 class ValidateEmailView(views.APIView):
     """ Determine if an email is already registered with a user account."""
 
 
     def get(self,request):
-        print('Check email view.')
-        print (request.GET)
 
         email = request.GET.get('email')
         userid = request.GET.get('userid')
