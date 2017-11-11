@@ -1,11 +1,17 @@
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule }  from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { RouterModule, Routes } from '@angular/router';
 import { HttpClientModule }    from '@angular/common/http';
 
-import { MaterialModule } from './material.module';
+// import { MaterialModule } from './material.module';
+import {
+  MatButtonModule,
+  MatMenuModule,
+  MatToolbarModule,
+  MatIconModule
+} from '@angular/material';
 
 import { AppComponent } from './app.component';
 
@@ -35,12 +41,13 @@ const appRoutes: Routes = [];
 @NgModule({
   imports: [
     BrowserModule,
-    BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    MaterialModule,
-
+    MatButtonModule,
+    MatMenuModule,
+    MatToolbarModule,
+    MatIconModule,
     AuthenticationModule,
     HomeModule,
     RouterModule.forRoot(

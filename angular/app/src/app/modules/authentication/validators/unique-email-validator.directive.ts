@@ -24,10 +24,9 @@ export class UniqueEmailValidatorDirective implements Validator {
     };
 
     // check if email is unique
-    return this.AuthenticationService.checkEmailIsRegistered(formControl.value).toPromise().then(
+    return this.AuthenticationService.validateEmail(formControl.value).toPromise().then(
         (response) => {
-          if ( response.length < 1 ) { 
-            console.log(response);
+          if ( response.valid ) { 
             return null;
           }
           else {

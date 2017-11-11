@@ -5,7 +5,7 @@ from .views import UserViewSet, AuthenticationView, ResetPasswordRequestView, Va
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet, base_name='user')
+router.register(r'users', UserViewSet, base_name='users')
 
 urlpatterns = [
     url(r'^',include(router.urls)),

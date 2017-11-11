@@ -152,22 +152,23 @@ python manage.py makemigrations app --empty
 
 ### Todo
 
-Send Password Reset Emails DONE
+X Send Password Reset Emails DONE
 
-Perform Password Reset - Monday
+X Perform Password Reset - Monday
 
-Perform Login - Tuesday
+X Perform Login - Tuesday
 
-Allow user to change email and password - Wednesday
+X Allow user to change email and password - Wednesday
 
-Material Icons from Local Host
+X Material Icons from Local Host
 
 AOT
 
 i18n
 -----
 
-Writing Django Tests - Thursday
+
+X Writing Django Tests - Thursday
 
 Writing Angular Tests - Friday
 
@@ -177,9 +178,31 @@ Move Django Authenitcation to a Reusable App - Monday/Tuesday
 Publish Django Authentication Module - Wednesday
 
 
+
 Move Angular Authentication to a Reusable App - Thursday/Friday
 
-Publish Angular Authentication Module - Saturday Nov-11
+Publish Angular Authentication Module - Saturday Nov-18
+
+
+
+Refactor Quickstart App - Monday November 20
+
+Create Contacts Application - Nov 21 - Nov 24
+
+
+
+Nov 27 - Dec 1 - Oikos TimeClock Application
+
+Dec 4 - 8 Doxa Reboot 2.0
+
+	- File Uploading
+
+	- Profiles
+
+
+
+
+
 
 -----
 

@@ -8,15 +8,15 @@ import { AuthenticationService } from '../services/authentication.service';
 
 @Component({
   templateUrl: './login.component.html',
-   providers: [AuthenticationService],
-   animations: [slideIn, slideOut, shrinkOut]
+  animations: [slideIn, slideOut, shrinkOut]
 })
 export class LoginComponent implements OnInit {
 
 	private model: any = {};
     private form: any;
-    private formState: string = 'pending';
+    // if form has been submitted and awaiting response
     private loading: boolean = false;
+    // display password unobscured
     private showPassword: boolean;
 
 	constructor(
@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit {
 
 	submit() {
 		this.loading = true;
-		this.service.login(this.model)
+		this.service.login(this.model.username, this.model.password)
 			.then( 
 				(user:any) => {
 					this.loading = false;

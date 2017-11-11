@@ -223,7 +223,6 @@ class APITestCase(TestCase):
     self.assertEqual(response.status_code, 401, "User has been disabled")    
 
 
-
   def test_validate_email(self):
 
     # check if email is available ( yes available )
