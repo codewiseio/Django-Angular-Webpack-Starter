@@ -165,15 +165,19 @@ X Material Icons from Local Host
 AOT
 
 i18n
+
+Guards
 -----
 
 
 X Writing Django Tests - Thursday
 
-Writing Angular Tests - Friday
+.. Writing Angular Tests - Friday
 
 
-Move Django Authenitcation to a Reusable App - Monday/Tuesday
+X Move Django Authentication to a Reusable App
+
+- Permissions
 
 Publish Django Authentication Module - Wednesday
 

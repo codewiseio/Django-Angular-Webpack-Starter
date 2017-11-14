@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'app',
     'corsheaders',
     'angular',
-    'authentication'
+    'agape.authentication'
 ]
 
 
