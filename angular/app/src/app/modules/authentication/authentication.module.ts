@@ -17,6 +17,8 @@ import {
 import { RegisterComponent } from './components/register.component';
 import { UserActivationComponent } from './components/user-activation.component';
 import { LoginComponent } from './components/login.component';
+import { LogoutComponent } from './components/logout.component';
+
 import { ResetPasswordComponent } from './components/reset-password.component';
 import { ResetPasswordRequestComponent } from './components/reset-password-request.component';
 
@@ -50,11 +52,14 @@ import { AuthRequestOptions } from './authentication-request';
     ResetPasswordRequestComponent,
     UserActivationComponent,
     LoginComponent,
+    LogoutComponent,
     ConfirmPasswordValidatorDirective,
     UniqueEmailValidatorDirective,
   ],
   providers: [ 
     AuthenticationService,
+
+    /* Adds the Authorization: Bearer xxxxx http header to every request */
     {
       provide: RequestOptions, 
       useClass: AuthRequestOptions

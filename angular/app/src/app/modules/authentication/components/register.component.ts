@@ -10,7 +10,7 @@ const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA
 
 @Component({
   templateUrl: './register.component.html',
-  animations: [slideIn, shrinkOut]
+  animations: [slideIn, slideOut, shrinkOut]
 })
 export class RegisterComponent implements OnInit {
 

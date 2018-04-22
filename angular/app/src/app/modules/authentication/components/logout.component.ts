@@ -7,47 +7,44 @@ import { slideIn, slideOut, shrinkOut } from '../../../animations';
 import { AuthenticationService } from '../services/authentication.service';
 
 @Component({
-  templateUrl: './login.component.html',
+  templateUrl: './logout.component.html',
   animations: [slideIn, slideOut, shrinkOut]
 })
-export class LoginComponent implements OnInit {
+export class LogoutComponent implements OnInit {
 
-	private model: any = {};
-    private form: any;
     // if form has been submitted and awaiting response
-    private loading: boolean = false;
+    private loading: boolean = true;
     private formState: string = 'pending';
 
     // display password unobscured
-    private showPassword: boolean;
-
     private currentUser: User;
  
 
 	constructor(
 		private service: AuthenticationService,
 		private snackBar: MatSnackBar ) { 
+
 		let session =  JSON.parse(localStorage.getItem('currentUser'));
 		if ( session ) {
 			this.currentUser = session.user;
 		}
+
+		
 	}
 
 	ngOnInit() {
-		this.form = new FormGroup({
-			email: new FormControl('', [ ]),
-			password: new FormControl('', [ ]),
-		});
+		if ( this.currentUser ) {
+			this.performLogout();
+		}
 	}
 
-	submit() {
-		this.loading = true;
-		this.service.login(this.model.email, this.model.password)
+	performLogout() {
+		this.service.logout()
 			.then( 
 				(user:any) => {
 					this.loading = false;
 
-					let message = "Login Successful";
+					let message = "Signed out";
 					this.formState = 'complete';
 
 					this.snackBar.open(message, null, {
@@ -58,7 +55,7 @@ export class LoginComponent implements OnInit {
 				(response: any) => {
 					this.loading = false;
 					if ( response.status == 401 ) {
-						let message = "Incorrect password";
+						let message = "You could not be signed out.";
 
 						this.snackBar.open(message, null, {
 					      duration: 2000,

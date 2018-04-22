@@ -19,7 +19,7 @@ export const slideOut = trigger(
       'slideOut',
       [
       transition(
-        ':enter', [
+        ':leave', [
           style({transform: 'translateX(0%)', opacity: 1}),
           animate('200ms 205ms', style({transform: 'translateX(100%)', 'opacity': 0}))
         ]
@@ -33,8 +33,8 @@ export const shrinkOut =
       [
       transition(
         ':leave', [
-          style({transform: 'translateX(0) scale(1)'}),
-          animate('200ms', style({transform: 'translateX(0) scale(0)'}))
+          style({transform: 'translateX(0) scale(1)', opacity: 1}),
+          animate('200ms', style({transform: 'translateX(0) scale(0)', 'opacity': 0}))
         ]
       ),    
       ] 

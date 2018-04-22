@@ -1,5 +1,5 @@
 
-<mat-card class="sm-centered-card" [@slideIn] [@shrinkOut] *ngIf="formState == 'pending'"> 
+<mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'pending'"> 
 
 	<form class="register-form" (ngSubmit)="submit(form)" [formGroup]="form">
 		

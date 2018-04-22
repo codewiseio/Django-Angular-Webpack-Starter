@@ -1,6 +1,6 @@
 
-
-<mat-card class="sm-centered-card" [@slideIn] [@shrinkOut] > 
+<!-- Display login form if not logged in -->
+<mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'pending' && ! currentUser" > 
 	<form class="login-form" (ngSubmit)="submit(form)" [formGroup]="form">
 
 		<mat-card-title>
@@ -42,5 +42,39 @@
 	</form>
 	<mat-progress-bar mode="indeterminate" class="valign-bottom" *ngIf="loading"></mat-progress-bar>
 
+</mat-card>
+
+<!-- Display a message on login successful -->
+<mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'complete'"> 
+		<mat-card-title>
+		  <span>Welcome Back!</span>
+		</mat-card-title>
+
+		<mat-card-content class="row">
+				<div class="col-xs-12 spacious">
+					You are now logged in.
+				</div>
+		</mat-card-content>
+</mat-card>
+
+
+<!-- Display a message if the user is already logged in -->
+<mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'pending' && currentUser"> 
+		<mat-card-title>
+		  <span>Welcome Back!</span>
+		</mat-card-title>
+
+		<mat-card-content class="row">
+				<div class="col-xs-12 spacious">
+					You are currently logged in as {{currentUser.email}}.
+				</div>
+		</mat-card-content>
+	<mat-card-actions class="row">
+		<div class="col-sm-12 text-center">
+			<button mat-button>
+				<a routerLink="/logout" routerLinkActive="active">Sign out</a>
+			</button>
+		</div>
+	</mat-card-actions>
 </mat-card>
 

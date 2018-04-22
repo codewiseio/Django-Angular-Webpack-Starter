@@ -6,6 +6,7 @@
   "scripts": {
     "test:once": "karma start karma.conf.js --single-run",
     "build": "rimraf dist && webpack --config config/webpack.prod.js --bail",
+    "dev": "rimraf dist && webpack --config config/webpack.prod.js --watch",
     "buildtest": "rimraf dist && webpack --config config/webpack.dev.js --bail",
     "server": "lite-server -c=bs-config.json",
     "prestart": "npm run build",

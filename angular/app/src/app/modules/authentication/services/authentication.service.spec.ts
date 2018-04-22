@@ -40,7 +40,7 @@ describe('AuthenticationService', () => {
               return req.url === '/api/v1/authentication/email/'
                 && req.method === 'GET'
                 && req.params.get('email') === 'test@example.com';
-            }, `POST to 'api/v1/authentication/' with username and password`);
+            }, `POST to 'api/v1/authentication/' with email and password`);
 
 
         }) // end inject
@@ -63,9 +63,9 @@ describe('AuthenticationService', () => {
 
               return req.url === '/api/v1/authentication/'
                 && req.method === 'POST'
-                && req.body.username === 'test@example.com'
+                && req.body.email === 'test@example.com'
                 && req.body.password === 'password';
-            }, `POST to 'api/v1/authentication/' with username and password`);
+            }, `POST to 'api/v1/authentication/' with email and password`);
 
         }) // end inject
       ) // end async
@@ -81,7 +81,7 @@ describe('AuthenticationService', () => {
           (service: AuthenticationService, backend: HttpTestingController) => {
        
             let newUser = {
-              username: 'test@example.com',
+              email: 'test@example.com',
               password: 'password'
             };
 
@@ -92,9 +92,9 @@ describe('AuthenticationService', () => {
 
               return req.url === '/api/v1/users/'
                 && req.method === 'POST'
-                && req.body.username === 'test@example.com'
+                && req.body.email === 'test@example.com'
                 && req.body.password === 'password';
-            }, `POST to '/api/v1/users/' with username and password`);
+            }, `POST to '/api/v1/users/' with email and password`);
 
         }) // end inject
       ) // end async

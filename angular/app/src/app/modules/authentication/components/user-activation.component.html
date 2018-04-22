@@ -1,6 +1,6 @@
 
 
-<mat-card class="sm-centered-card" [@slideIn] [@shrinkOut]  *ngIf="pageState == 'success'"> 
+<mat-card class="sm-centered-card" [@slideIn]  *ngIf="pageState == 'success'"> 
 	<mat-card-title>
 	  <span>Ready</span>
 	</mat-card-title>
@@ -18,7 +18,7 @@
 </mat-card>
 
 
-<mat-card class="sm-centered-card" [@slideIn] [@shrinkOut]  *ngIf="pageState == 'fail'"> 
+<mat-card class="sm-centered-card" [@slideIn]   *ngIf="pageState == 'fail'"> 
 	<mat-card-title>
 	  <span>Hmmm...</span>
 	</mat-card-title>
@@ -31,7 +31,7 @@
 </mat-card>
 
 
-<mat-card class="sm-centered-card " [@slideIn] [@shrinkOut]  *ngIf="pageState == 'duplicate'"> 
+<mat-card class="sm-centered-card " [@slideIn]   *ngIf="pageState == 'duplicate'"> 
 	<mat-card-title>
 	  <span>Hmmm...</span>
 	</mat-card-title>

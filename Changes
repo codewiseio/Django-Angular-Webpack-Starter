@@ -1,0 +1,6 @@
+
+April-21
+
+- Removed [shrinkOut] animation from forms because the element is reappearing after the animation
+- Added logout component
+

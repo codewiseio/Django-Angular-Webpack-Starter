@@ -27,10 +27,16 @@ export class AuthenticationService {
     return this.http.patch(`${this.api}/authentication/`, { key: key }, { headers: headers} );
   }
 
-  login(username: string, password: string) {
+  /**
+   * Authenticate a user using email and password.
+   *
+   * @param {string} email    [description]
+   * @param {string} password [description]
+   */
+  login(email: string, password: string) {
 
       let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-      let data = { username: username, password: password };
+      let data = { email: email, password: password };
 
       return this.http
         .post(`${this.api}/authentication/`, data, { headers: headers } )
@@ -42,6 +48,27 @@ export class AuthenticationService {
                 localStorage.setItem('currentUser', JSON.stringify(response));
                 localStorage.setItem(TOKEN_NAME,response.token)
                 return response as User;
+             }
+            )
+  }
+
+  /**
+   * Log out the current user.
+   */
+  logout() {
+
+      let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+      return this.http
+        .delete(`${this.api}/authentication/` )
+           .toPromise()
+           .then(
+             (response: any) => {
+                // login successful if there's a jwt token in the response
+                console.log('Logout successful');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem(TOKEN_NAME)
+                return response;
              }
             )
   }
