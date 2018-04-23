@@ -6,6 +6,7 @@ import { RequestOptions } from '@angular/http';
 
 import {
   MatButtonModule,
+  MatDialogModule,
   MatIconModule,
   MatInputModule,
   MatCardModule,
@@ -14,13 +15,17 @@ import {
   MatSnackBarModule
 } from '@angular/material';
 
+
 import { RegisterComponent } from './components/register.component';
 import { UserActivationComponent } from './components/user-activation.component';
 import { LoginComponent } from './components/login.component';
 import { LogoutComponent } from './components/logout.component';
+import { ModifyCredentialsComponent } from './components/modify-credentials.component';
 
 import { ResetPasswordComponent } from './components/reset-password.component';
 import { ResetPasswordRequestComponent } from './components/reset-password-request.component';
+
+import { ConfirmPasswordDialogComponent } from './components/confirm-password-dialog.component';
 
 import { UniqueEmailValidatorDirective } from './validators/unique-email-validator.directive';
 import { ConfirmPasswordValidatorDirective } from './validators/confirm-password-validator.directive';
@@ -37,6 +42,7 @@ import { AuthRequestOptions } from './authentication-request';
     ReactiveFormsModule,
 
     MatButtonModule,
+    MatDialogModule,
     MatIconModule,
     MatInputModule,
     MatCardModule,
@@ -53,6 +59,8 @@ import { AuthRequestOptions } from './authentication-request';
     UserActivationComponent,
     LoginComponent,
     LogoutComponent,
+    ModifyCredentialsComponent,
+    ConfirmPasswordDialogComponent,
     ConfirmPasswordValidatorDirective,
     UniqueEmailValidatorDirective,
   ],
@@ -64,7 +72,8 @@ import { AuthRequestOptions } from './authentication-request';
       provide: RequestOptions, 
       useClass: AuthRequestOptions
     }
-  ]
+  ],
+  entryComponents: [ConfirmPasswordDialogComponent]
   
 })
 export class AuthenticationModule {

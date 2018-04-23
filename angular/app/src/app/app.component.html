@@ -4,8 +4,18 @@
 <button mat-button [matMenuTriggerFor]="appMenu"><mat-icon>menu</mat-icon> Menu</button>
 </mat-toolbar>
 <mat-menu #appMenu="matMenu">
-<button mat-menu-item> Settings </button>
-<button mat-menu-item> Contact </button>
+<a routerLink="/register">
+	<button mat-menu-item > Sign up </button>
+</a>
+<a routerLink="/login">
+	<button mat-menu-item > Login </button>
+</a>
+<a routerLink="/account">
+	<button mat-menu-item > Account </button>
+</a>
+<a routerLink="/logout">
+	<button mat-menu-item > Logout </button>
+</a>
 </mat-menu>
 
 

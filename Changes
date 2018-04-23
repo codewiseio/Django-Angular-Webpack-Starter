@@ -1,4 +1,8 @@
 
+April-23  v0.1.1
+
+- Add modify-account component to update credentials
+
 April-21
 
 - Removed [shrinkOut] animation from forms because the element is reappearing after the animation

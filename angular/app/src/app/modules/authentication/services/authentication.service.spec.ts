@@ -201,7 +201,7 @@ describe('AuthenticationService', () => {
           (service: AuthenticationService, backend: HttpTestingController) => {
        
             // validate email
-            service.modifyCredentials(1, {email: 'new@example.com', confirm_password: 'password'}).subscribe();
+            service.modifyCredentials(1, {email: 'new@example.com', confirm_password: 'password'}).then();
 
             backend.expectOne((req: HttpRequest<any>) => {
 
@@ -224,7 +224,7 @@ describe('AuthenticationService', () => {
           (service: AuthenticationService, backend: HttpTestingController) => {
        
             // validate email
-            service.modifyCredentials(1, {password: 'newpassword', confirm_password: 'password'}).subscribe();
+            service.modifyCredentials(1, {password: 'newpassword', confirm_password: 'password'}).then();
 
             backend.expectOne((req: HttpRequest<any>) => {
 

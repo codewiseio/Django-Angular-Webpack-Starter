@@ -41,7 +41,7 @@ export class ResetPasswordComponent implements OnInit {
 				},
 				(response) => {
 					console.log(response);
-					if ( response.status == 401 || response.status == 404 ) {
+					if ( response.status == 401 || response.status == 404 || response.status == 410 ) {
 						this.errorMessage = "This link has expired or is not valid.";
 					}
 					this.formState = 'error';

@@ -1,16 +1,12 @@
 
 <!-- Display a message while the user is being signed out. -->
 <mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'pending' && currentUser" > 
-	<form class="logout-form" (ngSubmit)="submit(form)" [formGroup]="form">
-
 		<mat-card-content class="row">
 				<div class="col-xs-12 spacious">
 					You are being signed out.
 				</div>
 				<div class="clearfix"></div>
 		</mat-card-content>
-
-	</form>
 	<mat-progress-bar mode="indeterminate" class="valign-bottom" *ngIf="loading"></mat-progress-bar>
 
 </mat-card>

@@ -83,8 +83,34 @@ export class AuthenticationService {
    * @param {object}   data   Object containing 'email' or 'password', and obligatory 'confirm_password' fields
    */
   modifyCredentials(userId: number, data: { email?: string, password?: string, confirm_password: string}) {
+
+      // remove a blank password if the key is supplied
+      if ( 'password' in data && ! data.password ) {
+        delete data['password'];
+      }
+
       let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-      return this.http.patch(`${this.api}/users/${userId}/`, data, { headers: headers} );
+      return this.http
+        .patch(`${this.api}/users/${userId}/`, data, { headers: headers} )
+        .toPromise()
+        .then(
+         (response: any) => {
+            // login successful if there's a jwt token in the response
+            console.log('Credentials modified.');
+            console.log(response);
+
+            // retrieve the session data and update the user object using the response
+            let session =  JSON.parse(localStorage.getItem('currentUser'));
+            if ( session ) {
+              session.user = response;
+              console.log(session);
+            }
+
+            localStorage.setItem('currentUser', JSON.stringify(session));
+            console.log(localStorage.getItem('currentUser'));
+            return session;
+         }
+        );
   }
 
   /**
@@ -144,10 +170,10 @@ export class AuthenticationService {
    * @param  {number}          userid Returns true if the email is 
    * @return {Observable<any>}        [description]
    */
-  validateEmail(email: string, userid?: number ): Observable<any> {
+  validateEmail(email: string, userid?: string ): Observable<any> {
     let params = new HttpParams().set('email', email );
     if ( userid )
-       params = params.set('userid', userid.toString() );
+       params = params.set('userid', userid );
     return this.http.get(`${this.api}/authentication/email/`, { params: params }  );
   }
 
