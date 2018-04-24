@@ -32,8 +32,8 @@
 </mat-card>
 
 
-<!-- Display a message if the user is already logged in -->
-<mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'pending' && ! currentUser"> 
+<!-- Display a message if the user is not signed in -->
+<mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'pending' && ! service.user"> 
 	<mat-card-content class="row">
 			<div class="col-xs-12 spacious">
 				You are not signed in.

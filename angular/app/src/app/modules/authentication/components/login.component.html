@@ -59,7 +59,7 @@
 
 
 <!-- Display a message if the user is already logged in -->
-<mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'pending' && currentUser"> 
+<mat-card class="sm-centered-card" [@slideIn] *ngIf="formState == 'pending' && service.user"> 
 		<mat-card-title>
 		  <span>Welcome Back!</span>
 		</mat-card-title>

@@ -21,16 +21,11 @@ export class LoginComponent implements OnInit {
     // display password unobscured
     private showPassword: boolean;
 
-    private currentUser: User;
- 
 
 	constructor(
 		private service: AuthenticationService,
 		private snackBar: MatSnackBar ) { 
-		let session =  JSON.parse(localStorage.getItem('currentUser'));
-		if ( session ) {
-			this.currentUser = session.user;
-		}
+
 	}
 
 	ngOnInit() {

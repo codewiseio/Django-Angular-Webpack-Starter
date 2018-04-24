@@ -65,7 +65,7 @@ npm install
 
 ### Development 
 
-
+Development takes place using two tools. The Django development server to view the application in the browser, and webpack which watches for changes to the the angular application and rebuilds the angular application as necessary.
 
 ```
 cd ../..
@@ -79,11 +79,10 @@ http://localhost:8000.
 
 ```
 cd angular/app
-webpack --watch
+npm run dev
 ```
 
-This will watch the for changes in files in the angular app folder and rebuild
-as necessary. 
+This will watch the for changes in files in the angular app folder and rebuild the angular application as necessary. You will need to refresh your browser to view the changes.
 
 
 
@@ -129,7 +128,27 @@ Give an example
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+
+### Deploying to Fresh Ubuntu 17.10
+
+
+Install all updates
+
+```
+sudo apt-get update && sudo apt-get upgrade -y
+```
+
+Install pre-requisites
+
+```
+sudo apt-get install npm python3 -y
+```
+
+Clone the repository
+```
+```
+
+
 
 
 ## Additional Information
@@ -150,78 +169,6 @@ class MyModel(models.Model):
 python manage.py makemigrations app --empty
 
 
-### Todo
-
-X Send Password Reset Emails DONE
-
-X Perform Password Reset - Monday
-
-X Perform Login - Tuesday
-
-X Allow user to change email and password - Wednesday
-
-X Material Icons from Local Host
-
-AOT
-
-i18n
-
-Guards
------
-
-
-X Writing Django Tests - Thursday
-
-.. Writing Angular Tests - Friday
-
-
-X Move Django Authentication to a Reusable App
-
-- Permissions
-
-Publish Django Authentication Module - Wednesday
-
-
-
-Move Angular Authentication to a Reusable App - Thursday/Friday
-
-Publish Angular Authentication Module - Saturday Nov-18
-
-
-
-Refactor Quickstart App - Monday November 20
-
-Create Contacts Application - Nov 21 - Nov 24
-
-
-
-Nov 27 - Dec 1 - Oikos TimeClock Application
-
-Dec 4 - 8 Doxa Reboot 2.0
-
-	- File Uploading
-
-	- Profiles
-
-
-
-
-
-
------
-
-Create Contacts Application
-
-Create Blog - Wednesday
-
-Create
-
-
-Create Oikos Application - C
-
-Create 
-
-
 ## Resources
 
 ### Django Sites, finding absolute url
@@ -239,29 +186,13 @@ https://docs.djangoproject.com/en/1.11/topics/testing/overview/#running-tests
 https://docs.djangoproject.com/en/1.11/topics/testing/advanced/#testing-reusable-applications
 
 
-
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
 ## Authors
 
-* Jeffrey Hallock - [CodeWise.live](https://codewise.live)
+* Jeffrey Hallock, CodeWise Software
 
 ## License
 
-This project is licensed under the Artistic License 2.0 - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under [The MIT License](https://opensource.org/licenses/MIT)
 
 ## Acknowledgments
 

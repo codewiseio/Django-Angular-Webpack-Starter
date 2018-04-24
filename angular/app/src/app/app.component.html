@@ -4,17 +4,17 @@
 <button mat-button [matMenuTriggerFor]="appMenu"><mat-icon>menu</mat-icon> Menu</button>
 </mat-toolbar>
 <mat-menu #appMenu="matMenu">
-<a routerLink="/register">
+<a routerLink="/register" *ngIf="!auth.user">
 	<button mat-menu-item > Sign up </button>
 </a>
 <a routerLink="/login">
-	<button mat-menu-item > Login </button>
+	<button mat-menu-item  *ngIf="!auth.user"> Login </button>
 </a>
 <a routerLink="/account">
-	<button mat-menu-item > Account </button>
+	<button mat-menu-item  *ngIf="auth.user"> Account </button>
 </a>
 <a routerLink="/logout">
-	<button mat-menu-item > Logout </button>
+	<button mat-menu-item  *ngIf="auth.user"> Logout </button>
 </a>
 </mat-menu>
 

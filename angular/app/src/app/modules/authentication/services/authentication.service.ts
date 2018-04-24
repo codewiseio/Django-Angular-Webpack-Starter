@@ -13,8 +13,15 @@ export const TOKEN_NAME: string = 'authToken';
 export class AuthenticationService {
 
   api: any = environment.api;
+  user: User;
+  token: string;
 
-  constructor(private http: HttpClient ) { }
+
+  constructor(private http: HttpClient ) { 
+    this.user =  JSON.parse(localStorage.getItem('currentUser'));
+
+    console.log(`AuthService loaded current user ${this.user}`);
+  }
 
 
   /**
@@ -26,6 +33,7 @@ export class AuthenticationService {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.patch(`${this.api}/authentication/`, { key: key }, { headers: headers} );
   }
+
 
   /**
    * Authenticate a user using email and password.
@@ -45,7 +53,13 @@ export class AuthenticationService {
              (response: any) => {
                 // login successful if there's a jwt token in the response
                 console.log('Login successful');
-                localStorage.setItem('currentUser', JSON.stringify(response));
+
+                // set the user/token variables
+                this.user = response.user;
+                this.token = response.token;
+
+                // store the user in the local storage
+                localStorage.setItem('currentUser', JSON.stringify(this.user));
                 localStorage.setItem(TOKEN_NAME,response.token)
                 return response as User;
              }
@@ -59,15 +73,22 @@ export class AuthenticationService {
 
       let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
 
+      // perform api call
       return this.http
         .delete(`${this.api}/authentication/` )
            .toPromise()
            .then(
              (response: any) => {
-                // login successful if there's a jwt token in the response
                 console.log('Logout successful');
+
+                // unset the user/token variables
+                this.user = null;
+                this.token = null;
+
+                // remove the user from local storage
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem(TOKEN_NAME)
+
                 return response;
              }
             )
@@ -97,18 +118,14 @@ export class AuthenticationService {
          (response: any) => {
             // login successful if there's a jwt token in the response
             console.log('Credentials modified.');
-            console.log(response);
 
-            // retrieve the session data and update the user object using the response
-            let session =  JSON.parse(localStorage.getItem('currentUser'));
-            if ( session ) {
-              session.user = response;
-              console.log(session);
-            }
+            // update the user variable
+            this.user = response;
 
-            localStorage.setItem('currentUser', JSON.stringify(session));
-            console.log(localStorage.getItem('currentUser'));
-            return session;
+            // update the user in the local storage
+            localStorage.setItem('currentUser', JSON.stringify(this.user));
+            
+            return response;
          }
         );
   }

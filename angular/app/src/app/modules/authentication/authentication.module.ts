@@ -78,11 +78,11 @@ import { AuthRequestOptions } from './authentication-request';
 })
 export class AuthenticationModule {
 
-  // static forRoot(): ModuleWithProviders {
-  //   return {
-  //     ngModule: CreditCardModule,
-  //     providers: [CreditCardService]
-  //   }
-  // }
+  static forRoot(): ModuleWithProviders {
+    return {
+      ngModule: AuthenticationModule,
+      providers: [ AuthenticationService ]
+    }
+  }
 
 }

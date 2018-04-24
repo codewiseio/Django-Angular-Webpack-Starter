@@ -16,24 +16,17 @@ export class LogoutComponent implements OnInit {
     private loading: boolean = true;
     private formState: string = 'pending';
 
-    // display password unobscured
-    private currentUser: User;
- 
-
 	constructor(
 		private service: AuthenticationService,
-		private snackBar: MatSnackBar ) { 
-
-		let session =  JSON.parse(localStorage.getItem('currentUser'));
-		if ( session ) {
-			this.currentUser = session.user;
-		}
-
-		
+		private snackBar: MatSnackBar ) { 		
 	}
 
 	ngOnInit() {
-		if ( this.currentUser ) {
+
+		console.log('******LOGGING OUT*******');
+		console.log(this.service);
+
+		if ( this.service.user ) {
 			this.performLogout();
 		}
 	}

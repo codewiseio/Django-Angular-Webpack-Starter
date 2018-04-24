@@ -48,7 +48,7 @@ const appRoutes: Routes = [];
     MatMenuModule,
     MatToolbarModule,
     MatIconModule,
-    AuthenticationModule,
+    AuthenticationModule.forRoot(),
     HomeModule,
     RouterModule.forRoot(
       appRoutes,

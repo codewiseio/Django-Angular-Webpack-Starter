@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import '../assets/css/styles.css';
 import { User } from './modules/authentication/models/user';
+import { AuthenticationService } from './modules/authentication/services/authentication.service';
 
 @Component({
   selector: 'app',
@@ -13,11 +14,9 @@ export class AppComponent {
 	private currentUser: User;
 	 
 
-	constructor() { 
-		let session =  JSON.parse(localStorage.getItem('currentUser'));
-		if ( session ) {
-			this.currentUser = session.user;
-		}
+	constructor(
+		private auth: AuthenticationService ) { 
+
 	}
 
 }

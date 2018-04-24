@@ -25,8 +25,6 @@ export class ModifyCredentialsComponent implements OnInit {
     private loading: boolean = false;
     private formState: string = 'pending';
 
-    private currentUser: User;
-
     constructor(
         private service: AuthenticationService,
         public dialog: MatDialog,
@@ -38,13 +36,7 @@ export class ModifyCredentialsComponent implements OnInit {
 			password: new FormControl('', [ ]),
 		});
 
-		let session =  JSON.parse(localStorage.getItem('currentUser'));
-		console.log('Retrieve session');
-		console.log(session);
-		if ( session ) {
-			this.currentUser = session.user;
-			this.model.email = this.currentUser.email;
-		}
+		this.model.email = this.service.user.email;
 	}
 
 	/**
@@ -56,15 +48,18 @@ export class ModifyCredentialsComponent implements OnInit {
 		const dlg = this.dialog.open(ConfirmPasswordDialogComponent, {
 	      width:"350px"
 	    });
+
+	    // after the dialog is closed, perform api call
 	    dlg.afterClosed().toPromise().then(
 	    		(password) =>  {
 	    			this.loading = true;
 
+	    			// password supplied, continue with api call
 	    			if ( password ) {
 		    			let data = {...this.model};
 		    			data.confirm_password = password;
 
-						this.service.modifyCredentials(this.currentUser.id, data)
+						this.service.modifyCredentials(this.service.user.id, data)
 							.then( user => {
 								this.formState = 'complete';
 								this.loading = false;
