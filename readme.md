@@ -128,25 +128,77 @@ Give an example
 
 ## Deployment
 
+This guide will provide instruction on configuring a Ubuntu server with Postgress and Nginx and deploying your application.
 
 ### Deploying to Fresh Ubuntu 17.10
 
 
-Install all updates
+#### Install all updates
 
 ```
 sudo apt-get update && sudo apt-get upgrade -y
 ```
 
-Install pre-requisites
+#### Install pre-requisites
 
 ```
-sudo apt-get install npm python3 -y
+sudo apt-get install npm python3 python3-pip python3-dev -y
+sudo apt-get install libpq-dev postgresql postgresql-contrib nginx -y
 ```
+
+Upgrade pip and install virtualenv
+
+```
+sudo -H pip3 install --upgrade pip
+sudo -H pip3 install virtualenv
+```
+
+#### Create a PostgresSQL Database
+
+```
+# initiate postrgres console
+sudo -u postgres psql
+
+# create the database
+postgres=# CREATE DATABASE daws;
+
+```
+
+Configure the user account in Postgres:
+
+"We are setting the default encoding to UTF-8, which Django expects. We are also setting the default transaction isolation scheme to "read committed", which blocks reads from uncommitted transactions. Lastly, we are setting the timezone. By default, our Django projects will be set to use UTC. These are all recommendations from the Django project itself:"
+
+```
+# create the user
+CREATE USER dawsuser WITH PASSWORD 'password';
+
+# configure the user
+ALTER ROLE dawsuser SET client_encoding TO 'utf8';
+ALTER ROLE dawsuser SET default_transaction_isolation TO 'read committed';
+ALTER ROLE dawsuser SET timezone TO 'UTC';
+
+# grant permissions to the database
+GRANT ALL PRIVILEGES ON DATABASE daws TO dawsuser;
+```
+
+And finally exit the Postgres prompt.
+
+```
+postgres=# \q
+```
+
+#### Project Setup
 
 Clone the repository
+
 ```
+git clone git@gitlab.com:codewiseio/Django-Angular-Webpack-Starter.git daws
 ```
+
+
+
+### Reference
+https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04
 
 
 
