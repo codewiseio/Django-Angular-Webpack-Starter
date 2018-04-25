@@ -142,18 +142,20 @@ sudo apt-get update && sudo apt-get upgrade -y
 #### Install pre-requisites
 
 ```
-sudo apt-get install npm python3 python3-pip python3-dev -y
+sudo apt-get install npm python3 python3-pip python3-dev virtualenv -y
 sudo apt-get install libpq-dev postgresql postgresql-contrib nginx -y
 ```
 
-Upgrade pip and install virtualenv
+Upgrade pip 
 
 ```
 sudo -H pip3 install --upgrade pip
-sudo -H pip3 install virtualenv
 ```
 
 #### Create a PostgresSQL Database
+
+By default DAWS uses a SQLite3 database. If you want to use Postgres follow these
+instructions.
 
 ```
 # initiate postrgres console
@@ -189,11 +191,417 @@ postgres=# \q
 
 #### Project Setup
 
-Clone the repository
+
+##### Setup your SSH key
+
+If you do not have an .ssh key setup, create one now. Your project is also likely
+a private repository, so you will need to add your .ssh key to GitHub before you
+can clone your repo.
+
+Create the SSH key
+```
+cd ~/.ssh && ssh-keygen
+```
+
+Follow these instructions to add your SSH key to GitHub.
+
+https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/
+
+
+
+##### Clone the repository
 
 ```
+cd /var/www
+
 git clone git@gitlab.com:codewiseio/Django-Angular-Webpack-Starter.git daws
+
+# or
+
+git clone https://github.com/codewiseio/Django-Angular-Webpack-Starter.git daws
 ```
+
+##### Setup Environment
+
+Create a virtual environment for python.
+
+```
+cd daws
+
+# create environmnet
+virtualenv -p python3 venv
+
+# activate the environment
+source venv/bin/activate
+
+# install python modules
+pip install -r requirements.txt
+pip install djangorestframework-jwt
+
+# install gunicorn and and the psycopg2 Postgres adaptor
+pip install gunicorn psycopg2
+```
+
+##### Edit Local Configuration
+
+All your local configuration settings should be made in the `app/settings_local.py`
+file. Your production installation does not touch the `app/settings.py` which will
+be over-written on application updates.
+
+```
+vi app/settings_local.py
+```
+
+Copy the following settings `settings_local.py` file as needed.
+
+Add your ip address or domain name to the allowed hosts.
+
+```
+ALLOWED_HOSTS = ['your_server_domain_or_IP', 'second_domain_or_IP', ...]
+```
+
+
+If you are using email in your application:
+
+```
+EMAIL_HOST = 'smtp.sendgrid.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = '...'
+EMAIL_USE_TLS = True
+```
+
+If you want to use a Postgres database:
+
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'daws',
+        'USER': 'dawsuser',
+        'PASSWORD': 'dawspassword',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+```
+
+
+
+##### Complete Project Setup
+
+Migrate the database
+
+```
+python manage.py migrate
+```
+
+Create the primary super user account
+
+```
+python manage.py createsuperuser
+```
+
+Collect the static content
+
+```
+python manage.py collectstatic
+```
+
+
+You can test the the project is setup correctly by running the Django development server.
+
+
+Open port 8000
+```
+sudo ufw allow 8000
+```
+
+Start the server
+
+```
+python manage.py runserver 0.0.0.0:8000
+```
+
+View in your browser
+
+```
+http://server_domain_or_IP:8000
+```
+
+Test the super user account by navigating to:
+
+```
+http://server_domain_or_IP:8000/admin
+```
+
+##### Test Gunicorn's Ability to Serve Project
+
+```
+gunicorn --bind 0.0.0.0:8000 app.wsgi
+```
+
+And view in your browser.
+
+```
+http://server_domain_or_IP:8000
+```
+
+If everything is working up until this point you can deactivate the virtual environment.
+
+```
+deactivate
+```
+
+
+### Configure the Web Server
+
+We will be using Gunicorn and Nginx to serve application.
+
+
+
+#### Create a user for the application
+
+We will create a user specifically for the application for security purposes.
+
+```
+useradd -r daws -s /bin/false
+```
+
+Check to see that user was added succesfully
+
+```
+cat /etc/passwd
+```
+
+Set this user's primary group to `www-data`.
+
+```
+sudo usermod -g www-data daws
+```
+
+Change the ownership of project directory and files.
+
+```
+sudo chown -r /var/www/daws daws:www-data
+```
+
+
+
+#### Create a service for the application
+
+First we will create a systemd service which will be used to spin up Gunicorn
+and create a linux socket file.
+
+```
+[Unit]
+Description=DAWS Daemon
+After=network.target
+
+[Service]
+User=daws
+Group=www-data
+WorkingDirectory=/var/www/daws
+ExecStart=/var/www/daws/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/var/www/daws/app.sock app.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+```
+
+You can check that the service was started successfully by checking for the
+existence of the `app.sock` file.
+
+```
+ls /var/www/daws
+```
+
+If there is no `app.sock` check the logs.
+
+```
+sudo journalctl -u gunicorn
+```
+
+
+#### Configure Nginx
+
+Create a new configuration file for the site.
+
+```
+sudo vi /etc/nginx/sites-available/daws
+```
+
+
+Add the following to the file.
+
+```
+server {
+    listen 80;
+    server_name 0.0.0.0;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /var/www/daws/www;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/var/www/daws/app.sock;
+    }
+}
+```
+
+
+Enable the site.
+
+```
+sudo ln -s /etc/nginx/sites-available/daws /etc/nginx/sites-enabled
+```
+
+Test the configuration.
+
+```
+sudo nginx -t
+```
+
+Restart Nginx
+
+```
+sudo systemctl restart nginx
+```
+
+Remove access to port `8000` and open access to Nginx.
+
+```
+sudo ufw delete allow 8000
+sudo ufw allow 'Nginx Full'
+```
+
+Test that the server is working correctly by pointing your browser to:
+
+```
+http://your-domain-or-ip/
+```
+
+Update the server or domain name in the administrator panel.
+
+* Navigate to the "Sites" section
+* Update the existing site to point to your ip address or domain name
+
+
+### Setup SSL Encryption
+
+#### Self Signed Certificate
+
+If setting up SSL on an ip address (no domain name) you can create a self
+signed certificate. [reference](https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04)
+
+
+##### Create the certificate
+
+Create the certificate and Diffie-Hellman Group file.
+
+```
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+
+sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+```
+
+##### Configure Nginx
+
+Create a configuration snippet that points to the certificates.
+
+```
+sudo vi /etc/nginx/snippets/self-signed.conf
+
+### file contents ###
+
+ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+```
+
+Create a configuration file that sets strong security settings.
+
+```
+sudo vi /etc/nginx/snippets/ssl-params.conf
+
+### file contents ###
+
+# from https://cipherli.st/
+# and https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
+
+ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+ssl_prefer_server_ciphers on;
+ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
+ssl_ecdh_curve secp384r1;
+ssl_session_cache shared:SSL:10m;
+ssl_session_tickets off;
+ssl_stapling on;
+ssl_stapling_verify on;
+resolver 8.8.8.8 8.8.4.4 valid=300s;
+resolver_timeout 5s;
+# Disable preloading HSTS for now.  You can use the commented out header line that includes
+# the "preload" directive if you understand the implications.
+#add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+add_header Strict-Transport-Security "max-age=63072000; includeSubdomains";
+add_header X-Frame-Options DENY;
+add_header X-Content-Type-Options nosniff;
+
+ssl_dhparam /etc/ssl/certs/dhparam.pem;
+```
+
+Backup your site configuration.
+
+```
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
+```
+
+Open your site configuration for editing.
+```
+sudo vi /etc/nginx/sites-available/default
+
+### modify the file ###
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    # forwards http requests to https
+    server_name server_domain_or_IP;
+    return 302 https://$server_name$request_uri;
+
+    # SSL configuration
+
+    listen 443 ssl http2 default_server;
+    listen [::]:443 ssl http2 default_server;
+    include snippets/self-signed.conf;
+    include snippets/ssl-params.conf;
+
+    ...
+```
+
+Test the configuration
+
+```
+sudo nginx -t
+```
+
+Restart Nginx
+
+```
+sudo systemctl restart nginx
+```
+
+Navigate to the site in your browser.
+
+```
+https://your-site-or-ip
+```
+
+You will receive a warning about the site not being secure. This is
+because the certificate is self signed.
+
+
+
 
 
 

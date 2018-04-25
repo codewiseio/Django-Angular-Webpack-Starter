@@ -1,4 +1,9 @@
 
+April-24  v0.1.3
+- Added deployment instructions to documentation
+- Updated static files options in settings.py 
+- Updated app/wsgi.py file
+
 April-23  v0.1.2
 - Add user/token values to authentication service
 - Dynamic menu that changes available options based on user state
