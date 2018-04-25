@@ -89,13 +89,29 @@ http://localhost:8000
 
 #### Webpack 
 
-Watch for changes in the angular app and rebuild the bundle as necessary.
-Refresh your browser to see changes.
+Execute commands from the angular app directory.
 
 ```
 cd angular/app
+```
+
+##### Watch/Development Mode
+
+Watch for changes and rebuild the bundle as necessary.
+Refresh your browser to see changes.
+
+```
 npm run dev
 ```
+
+##### Build/Package Mode
+
+Build once and exit.
+
+```
+npm run build
+```
+
 
 <!-- #### Lite Server
 
@@ -115,12 +131,30 @@ in the future.
 
 
 
-### Creating a new component
+#### Creating Angular Components
 
+Execute commands from the angular app directory.
+
+```
+cd angular/app
+```
+
+##### Create New Component
+
+```
 ng g component my-new-component
+```
 
-## Creating a new django application
 
+#### Creating Django App
+
+Execute commands from the project directory.
+
+##### Create New Component
+
+```
+python manage.py startapp new-app-name
+```
 
 
 ## Deployment
