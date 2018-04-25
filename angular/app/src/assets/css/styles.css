@@ -60,3 +60,9 @@ mat-progress-bar.valign-bottom {
 	bottom: 0px;
 	left: 0px;
 }
+
+
+#sidenav {
+	width: 220px;
+	min-width: 220px;
+}

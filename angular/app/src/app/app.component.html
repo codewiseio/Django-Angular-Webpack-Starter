@@ -1,22 +1,42 @@
 <mat-toolbar color="primary">
 <span class="site-title"><a routerLink="/">Application</a></span>
 <span class="spacer"></span>
-<button mat-button [matMenuTriggerFor]="appMenu"><mat-icon>menu</mat-icon> Menu</button>
+
+<button mat-icon-button  *ngIf="auth.user" [matMenuTriggerFor]="appMenu"><mat-icon>account_circle</mat-icon></button>
+
+<button mat-icon-button *ngIf="isMobileView" (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+
+
 </mat-toolbar>
 <mat-menu #appMenu="matMenu">
-<a routerLink="/register" *ngIf="!auth.user">
-	<button mat-menu-item > Sign up </button>
-</a>
-<a routerLink="/login">
-	<button mat-menu-item  *ngIf="!auth.user"> Login </button>
-</a>
-<a routerLink="/account">
-	<button mat-menu-item  *ngIf="auth.user"> Account </button>
-</a>
-<a routerLink="/logout">
-	<button mat-menu-item  *ngIf="auth.user"> Logout </button>
-</a>
+	<a routerLink="/account">
+		<button mat-menu-item> Account </button>
+	</a>
+	<a routerLink="/logout">
+		<button mat-menu-item> Logout </button>
+	</a>
 </mat-menu>
 
 
-<router-outlet></router-outlet>
+<mat-sidenav-container id="sidenav-container">
+  <mat-sidenav id="sidenav" #sidenav mode="side">
+	<a routerLink="/register" *ngIf="!auth.user"  (click)="onNavbarLinkClick()">
+		<button mat-menu-item > Sign up </button>
+	</a>
+	<a routerLink="/login" (click)="onNavbarLinkClick()">
+		<button mat-menu-item  *ngIf="!auth.user"> Login </button>
+	</a>
+	<a routerLink="/account" (click)="onNavbarLinkClick()">
+		<button mat-menu-item  *ngIf="auth.user"> My Account </button>
+	</a>
+	<a routerLink="/logout" (click)="onNavbarLinkClick()">
+		<button mat-menu-item  *ngIf="auth.user"> Logout </button>
+	</a>
+  </mat-sidenav>
+
+  <mat-sidenav-content id="sidenav-content">
+	<router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+

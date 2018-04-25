@@ -9,6 +9,7 @@ import { HttpClientModule }    from '@angular/common/http';
 import {
   MatButtonModule,
   MatMenuModule,
+  MatSidenavModule,
   MatToolbarModule,
   MatIconModule
 } from '@angular/material';
@@ -46,6 +47,7 @@ const appRoutes: Routes = [];
     HttpClientModule,
     MatButtonModule,
     MatMenuModule,
+    MatSidenavModule,
     MatToolbarModule,
     MatIconModule,
     AuthenticationModule.forRoot(),
