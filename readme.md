@@ -4,19 +4,21 @@
 Starter pack for building an Angular 4 web application with Django backend.
 Includes Material Design library.
 
-## Getting Started
+## Developer Guide
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
 
-npm
+* npm
+* python3
+* pip
+* git
+* virtualenv
 
-python3
+### Installation
 
-pip
-
-### Installing
+#### Clone the repository
 
 Clone the repository from git
 
@@ -25,28 +27,28 @@ git clone git@gitlab.com:codewiseio/Django-Angular-Webpack-Starter.git
 ```
 
 
-#### Install Back End
+#### Python/Django Setup
 
-Create and enter python virtual environment.
+##### Create a virtual environment
 
 ```
 virtualenv -p python3 venv
 source ./venv/bin/activate
 ```
 
-Install the python requirements
+##### Install the python modules
 
 ```
 pip install -r requirements.txt
 ```
 
-Install database migrations
+##### Migrate database
 
 ```
 python manage.py migrate
 ```
 
-Create the super user. 
+##### Create superuser account
 
 ```
 python manage.py createsuperuser
