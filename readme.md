@@ -16,14 +16,15 @@ These instructions will get you a copy of the project up and running on your loc
 * git
 * virtualenv
 
-### Installation
+### Project Setup
 
 #### Clone the repository
 
-Clone the repository from git
+Clone and enter the repository from git
 
 ```
 git clone git@gitlab.com:codewiseio/Django-Angular-Webpack-Starter.git
+cd Django-Angular-Webpack-Starter
 ```
 
 
@@ -55,9 +56,9 @@ python manage.py createsuperuser
 ```
 
 
-#### Install Front End
+#### Angular/Webpack Setup
 
-Install the angular/material dependancies
+##### InstallAngular, Webpack, and dependencies
 
 ```
 cd angular/app
@@ -69,26 +70,34 @@ npm install
 
 Development takes place using two tools. The Django development server to view the application in the browser, and webpack which watches for changes to the the angular application and rebuilds the angular application as necessary.
 
+#### Django Development Server
+
+The Django development server starts a server on your local machine. Changes to the Python and Django code will cause the server to reload the application.
+
+##### Start the server
+
 ```
-cd ../..
 python manage.py runserver
 ```
 
-Start the Django development server and open in your browser at 
-http://localhost:8000. 
+##### View in browser
 
-#### Webpack
+```
+http://localhost:8000
+```
+
+
+#### Webpack 
+
+Watch for changes in the angular app and rebuild the bundle as necessary.
+Refresh your browser to see changes.
 
 ```
 cd angular/app
 npm run dev
 ```
 
-This will watch the for changes in files in the angular app folder and rebuild the angular application as necessary. You will need to refresh your browser to view the changes.
-
-
-
-#### Lite Server
+<!-- #### Lite Server
 
 ```
 cd angular/app
@@ -102,30 +111,16 @@ This will start the angular server which automatically refreshes the browser on 
 Angular does not currently support multiple CSRF tokens. For this reason it is not recommended
 to run a seperate development server for the Django and Angular applications. This may change
 in the future.
+ -->
 
 
 
-
-## Creating a new component
+### Creating a new component
 
 ng g component my-new-component
 
 ## Creating a new django application
 
-
-
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
 
 
 ## Deployment
