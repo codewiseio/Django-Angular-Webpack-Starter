@@ -164,7 +164,7 @@ This guide will provide instruction on configuring a Ubuntu server with Postgres
 ### Deploying to Fresh Ubuntu 17.10
 
 
-#### Install all updates
+#### Install all software updates
 
 ```
 sudo apt-get update && sudo apt-get upgrade -y
@@ -382,6 +382,18 @@ If everything is working up until this point you can deactivate the virtual envi
 
 ```
 deactivate
+```
+
+#### Installing Updates
+
+```
+git pull
+
+source venv/bin/activate
+
+python manage.py runserver collectstatic
+
+sudo systemctl restart daws
 ```
 
 
